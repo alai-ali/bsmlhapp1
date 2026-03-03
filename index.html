@@ -3,64 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BSMLH | Terminal v15</title>
+    <title>BSMLH | Terminal v16</title>
     <style>
-        :root { --gold: #f6851b; --bg: #000; --panel: #111; --text: #fff; --border: #222; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
+        :root { --gold: #f6851b; --bg: #000; --panel: #0d0d0d; --text: #fff; --border: #222; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; width: 100%; }
 
-        /* SPLASH SCREEN (3 SEC) */
+        /* SPLASH - ГАРАНТИРОВАННОЕ СКРЫТИЕ ЧЕРЕЗ CSS */
         #splash {
-            position: fixed; inset: 0; z-index: 10000; background: #000;
+            position: fixed; inset: 0; z-index: 99999; background: #000;
             display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+            animation: hideSplash 0.5s forwards 3s; /* Исчезнет ровно через 3 сек */
+            pointer-events: none;
         }
-        .s-title { font-size: 50px; font-weight: 900; letter-spacing: 15px; color: #fff; margin-bottom: 20px; }
-        .s-sub { font-size: 12px; color: #fff; font-weight: bold; letter-spacing: 1px; max-width: 80%; line-height: 1.5; }
+        @keyframes hideSplash { to { opacity: 0; visibility: hidden; } }
+        .s-title { font-size: 54px; font-weight: 900; letter-spacing: 15px; color: #fff; margin-bottom: 15px; }
+        .s-sub { font-size: 13px; color: #fff; font-weight: bold; letter-spacing: 1px; max-width: 85%; line-height: 1.4; text-transform: uppercase; }
 
         /* SCREENS */
-        .screen { position: fixed; inset: 0; background: #000; z-index: 1000; display: none; flex-direction: column; align-items: center; padding: 30px; }
+        .screen { position: fixed; inset: 0; background: #000; z-index: 1000; display: none; flex-direction: column; align-items: center; padding: 30px; overflow-y: auto; }
         .active-screen { display: flex; }
 
-        /* LANGUAGE SELECTOR */
-        .lang-bar { width: 100%; display: flex; justify-content: center; gap: 15px; margin-top: 10px; }
-        .l-btn { border: 1px solid var(--border); padding: 8px 12px; font-size: 12px; cursor: pointer; color: #666; font-weight: bold; }
-        .l-btn.on { color: var(--gold); border-color: var(--gold); }
+        /* LANG SELECTOR */
+        .lang-bar { width: 100%; display: flex; justify-content: center; gap: 10px; margin: 10px 0 30px 0; }
+        .l-btn { border: 1px solid var(--border); padding: 10px 15px; font-size: 12px; cursor: pointer; color: #555; font-weight: bold; border-radius: 5px; }
+        .l-btn.on { color: var(--gold); border-color: var(--gold); background: rgba(246, 133, 27, 0.1); }
 
-        .f-box { width: 100%; max-width: 350px; margin-top: 40px; display: flex; flex-direction: column; gap: 12px; }
-        input { background: #0a0a0a; border: 1px solid var(--border); padding: 18px; color: #fff; border-radius: 12px; outline: none; }
-        .btn-m { background: var(--gold); color: #000; border: none; padding: 20px; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; text-transform: uppercase; }
+        .f-box { width: 100%; max-width: 360px; display: flex; flex-direction: column; gap: 15px; }
+        input { background: #111; border: 1px solid var(--border); padding: 20px; color: #fff; border-radius: 12px; font-size: 16px; outline: none; width: 100%; }
+        input:focus { border-color: var(--gold); }
+        .btn-m { background: var(--gold); color: #000; border: none; padding: 22px; border-radius: 12px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 14px; letter-spacing: 1px; }
 
         /* SIDEBAR */
         #sidebar { 
             position: fixed; left: -280px; top: 0; bottom: 0; width: 280px; 
             background: #0a0a0a; z-index: 6000; transition: 0.3s; border-right: 1px solid var(--border); 
-            display: flex; flex-direction: column; padding: 20px;
+            display: flex; flex-direction: column; padding: 25px;
         }
         #sidebar.open { left: 0; }
-        .s-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 5500; display: none; }
-        .hist-item { padding: 12px; border-bottom: 1px solid #1a1a1a; font-size: 14px; color: #888; cursor: pointer; }
+        .s-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 5500; display: none; }
+        .hist-item { padding: 15px; border-bottom: 1px solid #1a1a1a; font-size: 14px; color: #777; cursor: pointer; }
 
-        /* APP LAYOUT */
-        #app { display: none; height: 100vh; flex-direction: column; }
-        header { height: 70px; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; border-bottom: 1px solid var(--border); }
-        main { flex: 1; overflow-y: auto; padding: 20px; }
+        /* APP */
+        #app { display: none; height: 100vh; flex-direction: column; background: #000; }
+        header { height: 75px; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; border-bottom: 1px solid var(--border); }
+        main { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; }
         
-        /* CHAT & PROFILE VIEWS */
-        .view { display: none; flex-direction: column; gap: 15px; }
+        .view { display: none; flex-direction: column; gap: 15px; width: 100%; }
         .v-active { display: flex; }
-        .msg { padding: 12px; border-radius: 10px; font-size: 14px; max-width: 85%; }
-        .msg.ai { background: #111; border-left: 3px solid var(--gold); align-self: flex-start; }
+        
+        /* CHAT */
+        .msg { padding: 15px; border-radius: 12px; font-size: 14px; max-width: 85%; line-height: 1.4; }
+        .msg.ai { background: #111; border-left: 4px solid var(--gold); align-self: flex-start; }
         .msg.u { background: var(--gold); color: #000; align-self: flex-end; font-weight: bold; }
 
-        .prof-card { background: #0a0a0a; border: 1px solid var(--border); padding: 25px; border-radius: 15px; text-align: center; }
+        /* PROFILE */
+        .prof-card { background: #0a0a0a; border: 1px solid var(--border); padding: 30px; border-radius: 20px; text-align: center; width: 100%; }
+        .avatar { width: 80px; height: 80px; background: #222; border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 30px; }
 
         /* FOOTER (LIFTED) */
-        footer { height: 95px; padding-bottom: 30px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--border); background: #050505; }
-        .nav-l { color: #444; font-size: 10px; font-weight: bold; cursor: pointer; text-align: center; }
+        footer { height: 100px; padding-bottom: 35px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--border); background: #050505; }
+        .nav-l { color: #555; font-size: 11px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
         .nav-l.active { color: var(--gold); }
 
-        .in-bar { padding: 15px; display: flex; gap: 10px; border-top: 1px solid var(--border); }
-        .in-bar input { flex: 1; padding: 10px; border-radius: 8px; }
+        .in-bar { padding: 15px; display: flex; gap: 10px; border-top: 1px solid var(--border); background: #000; }
+        .in-bar input { flex: 1; padding: 12px; border-radius: 10px; background: #111; border: 1px solid var(--border); }
     </style>
 </head>
 <body>
@@ -70,122 +77,145 @@
         <div class="s-sub">BIOMETRIC SECURITY MULTI-FUNCTION LEDGER FOR HUMANITY</div>
     </div>
 
-    <div id="scr-reg" class="screen">
+    <div id="scr-reg" class="screen active-screen">
         <div class="lang-bar">
-            <div class="l-btn on" onclick="setL('RU', this)">RU</div>
-            <div class="l-btn" onclick="setL('EN', this)">EN</div>
-            <div class="l-btn" onclick="setL('AR', this)">AR</div>
-            <div class="l-btn" onclick="setL('CH', this)">CH</div>
+            <div id="l-RU" class="l-btn on" onclick="changeLang('RU')">RU</div>
+            <div id="l-EN" class="l-btn" onclick="changeLang('EN')">EN</div>
+            <div id="l-AR" class="l-btn" onclick="changeLang('AR')">AR</div>
+            <div id="l-CH" class="l-btn" onclick="changeLang('CH')">CH</div>
         </div>
-        <h2 id="reg-h" style="margin-top:40px;">Регистрация</h2>
+        <h2 id="reg-h" style="margin-bottom: 20px; letter-spacing: 1px;">РЕГИСТРАЦИЯ</h2>
         <div class="f-box">
-            <input type="text" id="fn" placeholder="Имя">
-            <input type="text" id="ln" placeholder="Фамилия">
-            <input type="tel" id="ph" placeholder="Телефон">
-            <button class="btn-m" id="reg-b" onclick="toApp()">Инициализация</button>
+            <input type="text" id="fn" placeholder="ИМЯ">
+            <input type="text" id="ln" placeholder="ФАМИЛИЯ">
+            <input type="tel" id="ph" placeholder="ТЕЛЕФОН">
+            <button class="btn-m" id="reg-b" onclick="startApp()">ИНИЦИАЛИЗАЦИЯ</button>
         </div>
     </div>
 
     <div id="sidebar">
-        <h3 style="color:var(--gold); margin-bottom:20px;">HISTORY</h3>
-        <div id="hist-list"></div>
+        <h3 style="color:var(--gold); margin-bottom:25px; letter-spacing: 2px;">HISTORY</h3>
+        <div id="hist-list" style="overflow-y: auto;"></div>
     </div>
-    <div class="s-overlay" id="overlay" onclick="toggleSide()"></div>
+    <div class="s-overlay" id="overlay" onclick="closeSide()"></div>
 
     <div id="app">
         <header>
-            <div onclick="toggleSide()" style="font-size:24px; color:var(--gold); cursor:pointer;">☰</div>
-            <div style="font-weight:900; letter-spacing:3px;">BSMLH</div>
-            <div style="color:#333; font-size:20px;">⋮</div>
+            <div onclick="openSide()" style="font-size:26px; color:var(--gold); cursor:pointer;">☰</div>
+            <div style="font-weight:900; letter-spacing:4px; font-size: 18px;">BSMLH</div>
+            <div style="color:#222; font-size:22px;">⋮</div>
         </header>
 
-        <main id="main-area">
+        <main id="scroll-area">
             <div id="v-chat" class="view v-active">
-                <div class="msg ai" id="ai-greet">SYSTEM: ONLINE.</div>
+                <div class="msg ai" id="ai-g">СИСТЕМА: ИНИЦИАЛИЗАЦИЯ ЗАВЕРШЕНА.</div>
             </div>
             <div id="v-prof" class="view">
                 <div class="prof-card">
-                    <div style="width:70px; height:70px; background:#222; border-radius:50%; margin:0 auto 15px;"></div>
-                    <h3 id="p-name">USER NAME</h3>
-                    <p style="color:#444; margin-top:5px;">HUID: vHUID-8821-SECURE</p>
-                    <button class="btn-m" style="width:100%; margin-top:20px;" onclick="location.reload()">LOGOUT</button>
+                    <div class="avatar">👤</div>
+                    <h3 id="p-full-name">USER NAME</h3>
+                    <p style="color:var(--gold); margin-top:10px; font-size: 12px; font-family: monospace;">STATUS: vHUID-ENCRYPTED</p>
+                    <button class="btn-m" style="width:100%; margin-top:30px; background: transparent; border: 1px solid var(--border); color: #fff;" onclick="location.reload()">LOGOUT</button>
                 </div>
             </div>
         </main>
 
-        <div class="in-bar" id="input-zone">
-            <input type="text" id="m-in" placeholder=">_">
-            <button onclick="send()" style="background:var(--gold); border:none; padding:0 15px; border-radius:8px; font-weight:bold;">></button>
+        <div class="in-bar" id="input-ui">
+            <input type="text" id="m-text" placeholder=">_">
+            <button onclick="handleSend()" style="background:var(--gold); border:none; padding:0 20px; border-radius:10px; font-weight:bold;">></button>
         </div>
 
         <footer>
-            <div class="nav-l active" onclick="tab('chat', this)">CHAT</div>
-            <div class="nav-l" onclick="tab('maps', this)">MAPS</div>
+            <div id="n-chat" class="nav-l active" onclick="showTab('chat')">CHAT</div>
+            <div class="nav-l">MAPS</div>
             <div class="nav-l">HUB</div>
-            <div class="nav-l" onclick="tab('prof', this)" id="n-prof">PROFILE</div>
+            <div id="n-prof" class="nav-l" onclick="showTab('prof')">PROFILE</div>
         </footer>
     </div>
 
     <script>
-        // СЛОВАРЬ (4 ЯЗЫКА)
-        const dict = {
-            'RU': { h: "Регистрация", b: "Инициализация", g: "СИСТЕМА: ГОТОВА К РАБОТЕ.", p: "ПРОФИЛЬ", p1: "Имя", p2: "Фамилия", p3: "Телефон" },
-            'EN': { h: "Registration", b: "Initialize", g: "SYSTEM: READY.", p: "PROFILE", p1: "Name", p2: "Surname", p3: "Phone" },
-            'AR': { h: "تسجيل", b: "تهيئة", g: "النظام: جاهز", p: "الملف الشخصي", p1: "اسم", p2: "لقب", p3: "هاتف" },
-            'CH': { h: "注册", b: "初始化", g: "系统：就绪", p: "个人资料", p1: "名字", p2: "姓", p3: "电话" }
+        // СЛОВАРЬ
+        const translations = {
+            'RU': { h: "РЕГИСТРАЦИЯ", b: "ИНИЦИАЛИЗАЦИЯ", g: "СИСТЕМА: ГОТОВА К РАБОТЕ.", p: "ПРОФИЛЬ", p1: "ИМЯ", p2: "ФАМИЛИЯ", p3: "ТЕЛЕФОН", ai: "АНАЛИЗ ДАННЫХ... ОК." },
+            'EN': { h: "REGISTRATION", b: "INITIALIZE", g: "SYSTEM: ONLINE.", p: "PROFILE", p1: "NAME", p2: "SURNAME", p3: "PHONE", ai: "DATA ANALYSIS... OK." },
+            'AR': { h: "تسجيل", b: "تهيئة", g: "النظام: جاهز", p: "الملف الشخصي", p1: "اسم", p2: "لقб", p3: "هاتف", ai: "تحليل البيانات... حسنا" },
+            'CH': { h: "注册", b: "初始化", g: "系统：在线", p: "个人资料", p1: "名字", p2: "姓", p3: "电话", ai: "数据分析... 完成" }
         };
-        let curL = 'RU';
+        
+        let currentLang = 'RU';
 
-        // ИСТОРИЯ (10 ИМЕН)
-        const names = ["Alex", "Sarah", "Ahmed", "Li Wei", "Maria", "Ivan", "Fatima", "Chen", "John", "Elena"];
-        const hList = document.getElementById('hist-list');
-        names.forEach(n => hList.innerHTML += <div class="hist-item" onclick="toggleSide()">Conversation with ${n}</div>);
+        // ИСТОРИЯ
+        const users = ["Alex", "Sarah", "Ahmed", "Li Wei", "Maria", "Ivan", "Fatima", "Chen", "John", "Elena"];
+        const hContainer = document.getElementById('hist-list');
+        users.forEach(u => {
+            const div = document.createElement('div');
+            div.className = 'hist-item';
+            div.innerText = Log: session_with_${u};
+            div.onclick = closeSide;
+            hContainer.appendChild(div);
+        });
 
-        setTimeout(() => { document.getElementById('splash').style.display='none'; document.getElementById('scr-reg').classList.add('active-screen'); }, 3000);
-
-        function setL(l, el) {
-            curL = l;
+        function changeLang(lang) {
+            currentLang = lang;
             document.querySelectorAll('.l-btn').forEach(b => b.classList.remove('on'));
-            el.classList.add('on');
-            document.getElementById('reg-h').innerText = dict[l].h;
-            document.getElementById('reg-b').innerText = dict[l].b;
-            document.getElementById('ai-greet').innerText = dict[l].g;
-            document.getElementById('n-prof').innerText = dict[l].p;
-            document.getElementById('fn').placeholder = dict[l].p1;
-            document.getElementById('ln').placeholder = dict[l].p2;
-            document.getElementById('ph').placeholder = dict[l].p3;
+            document.getElementById('l-'+lang).classList.add('on');
+            
+            const t = translations[lang];
+            document.getElementById('reg-h').innerText = t.h;
+            document.getElementById('reg-b').innerText = t.b;
+            document.getElementById('ai-g').innerText = t.g;
+            document.getElementById('n-prof').innerText = t.p;
+            document.getElementById('fn').placeholder = t.p1;
+            document.getElementById('ln').placeholder = t.p2;
+            document.getElementById('ph').placeholder = t.p3;
         }
 
-        function toApp() {
-            document.getElementById('p-name').innerText = document.getElementById('fn').value + " " + document.getElementById('ln').value;
-            document.getElementById('scr-reg').classList.remove('active-screen');
+        function startApp() {
+            const name = document.getElementById('fn').value;
+            const surname = document.getElementById('ln').value;
+            if(!name) return alert("Enter Name");
+            
+            document.getElementById('p-full-name').innerText = name + " " + surname;
+            document.getElementById('scr-reg').style.display = 'none';
             document.getElementById('app').style.display = 'flex';
         }
 
-        function toggleSide() {
-            document.getElementById('sidebar').classList.toggle('open');
-            document.getElementById('overlay').style.display = document.getElementById('sidebar').classList.contains('open') ? 'block' : 'none';
+        function openSide() {
+            document.getElementById('sidebar').classList.add('open');
+            document.getElementById('overlay').style.display = 'block';
         }
 
-        function tab(t, el) {
-            document.getElementById('v-chat').classList.toggle('v-active', t === 'chat');
-            document.getElementById('input-zone').style.display = (t === 'chat' ? 'flex' : 'none');
-            document.getElementById('v-prof').classList.toggle('v-active', t === 'prof');
-            document.querySelectorAll('.nav-l').forEach(n => n.classList.remove('active'));
-            el.classList.add('active');
+        function closeSide() {
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('overlay').style.display = 'none';
         }
 
-        function send() {
-            const i = document.getElementById('m-in'); if(!i.value) return;
-            const v = document.getElementById('v-chat');
-            v.innerHTML += <div class="msg u">${i.value}</div>;
-            const val = i.value.toLowerCase(); i.value = '';
+        function showTab(type) {
+            document.getElementById('v-chat').classList.toggle('v-active', type === 'chat');
+            document.getElementById('input-ui').style.display = (type === 'chat' ? 'flex' : 'none');
+            document.getElementById('v-prof').classList.toggle('v-active', type === 'prof');
+            
+            document.getElementById('n-chat').classList.toggle('active', type === 'chat');
+            document.getElementById('n-prof').classList.toggle('active', type === 'prof');
+        }
+
+        function handleSend() {
+            const input = document.getElementById('m-text');
+            if(!input.value) return;
+            
+            const chat = document.getElementById('v-chat');
+            chat.innerHTML += <div class="msg u">${input.value}</div>;
+            const userMsg = input.value.toLowerCase();
+            input.value = '';
+
             setTimeout(() => {
-                let ans = curL === 'RU' ? "Запрос обработан. Статус: OK." : "Request processed. Status: OK.";
-                if(val.includes("привет") || val.includes("hello")) ans = curL === 'RU' ? "Приветствую. Чем могу помочь?" : "Greetings. How can I help?";
-                v.innerHTML += <div class="msg ai">${ans}</div>;
-                document.getElementById('main-area').scrollTop = v.scrollHeight;
-            }, 600);
+                let response = translations[currentLang].ai;
+                if(userMsg.includes("привет") || userMsg.includes("hello")) {
+                    response = currentLang === 'RU' ? "Система приветствует вас." : "System greets you.";
+                }
+                chat.innerHTML += <div class="msg ai">${response}</div>;
+                document.getElementById('scroll-area').scrollTop = chat.scrollHeight;
+            }, 700);
         }
     </script>
 </body>
