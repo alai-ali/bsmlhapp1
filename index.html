@@ -3,197 +3,224 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BSMLH | Security Console</title>
+    <title>BSMLH | Premium Edition</title>
     <style>
-        :root { --bg: #0d0d0d; --gold: #f6851b; --text: #fff; --border: #222; --danger: #ff3b30; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; }
-        body { background: #000; color: var(--text); height: 100vh; overflow: hidden; }
+        :root { 
+            --gold: #d4af37; /* Платиновое золото */
+            --text: #ffffff;
+            --border: rgba(255,255,255,0.1);
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', -apple-system, sans-serif; }
 
-        /* SPLASH SCREEN */
-        #splash { position: fixed; inset: 0; background: #1a1a1a; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; transition: 1s; }
-        .splash-title { color: var(--gold); font-size: 32px; letter-spacing: 8px; margin-bottom: 10px; font-weight: bold; }
-        .splash-sub { color: #666; font-size: 10px; text-transform: uppercase; letter-spacing: 2px; line-height: 1.5; }
+        /* АНИМИРОВАННЫЙ ПЕРЕЛИВАЮЩИЙСЯ ФОН */
+        body { 
+            background: linear-gradient(135deg, #050505, #1a1a1a, #0a0a0a, #1f1f1f);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: var(--text);
+            height: 100vh;
+            overflow: hidden;
+        }
 
-        /* SCREENS */
-        .screen { position: fixed; inset: 0; background: #000; z-index: 1000; display: none; flex-direction: column; align-items: center; padding: 30px; overflow-y: auto; }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* ЗАСТАВКА С ГОРЯЩИМИ БУКВАМИ */
+        #splash {
+            position: fixed; inset: 0; z-index: 9999;
+            background: inherit;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 1.5s ease;
+        }
+
+        .breathing-text {
+            font-size: 40px; font-weight: 200; letter-spacing: 15px; color: #fff;
+            animation: breathe 3s ease-in-out infinite;
+            text-shadow: 0 0 20px rgba(255,255,255,0.2);
+        }
+
+        @keyframes breathe {
+            0%, 100% { opacity: 0.3; transform: scale(0.98); }
+            50% { opacity: 1; transform: scale(1.02); text-shadow: 0 0 30px rgba(255,255,255,0.6); }
+        }
+
+        /* ИНТЕРФЕЙС РЕГИСТРАЦИИ */
+        .screen { position: fixed; inset: 0; padding: 40px 30px; display: none; flex-direction: column; align-items: center; }
         .active-screen { display: flex; }
-        
-        .header-reg { width: 100%; display: flex; justify-content: flex-end; margin-bottom: 20px; }
-        .lang-icon { font-size: 24px; cursor: pointer; color: var(--gold); }
 
-        .input-box { width: 100%; max-width: 340px; display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
-        input { background: #111; border: 1px solid var(--border); padding: 18px; border-radius: 12px; color: #fff; outline: none; font-size: 16px; }
-        .btn-main { background: var(--gold); color: #000; border: none; padding: 20px; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; max-width: 340px; margin-top: 20px; }
+        .lang-select { position: absolute; top: 50px; right: 30px; z-index: 1100; }
+        #lang-dropdown { 
+            display: none; position: absolute; right: 0; top: 35px; 
+            background: rgba(20,20,20,0.95); border: 1px solid var(--border);
+            border-radius: 12px; overflow: hidden; width: 120px;
+        }
+        .lang-opt { padding: 12px; font-size: 14px; border-bottom: 1px solid var(--border); cursor: pointer; }
 
-        /* SMS CODE */
-        .code-container { display: flex; gap: 10px; justify-content: center; margin: 30px 0; }
-        .code-input { width: 50px; height: 60px; text-align: center; font-size: 24px; background: #111; border: 1px solid var(--border); border-radius: 10px; color: var(--gold); }
+        .input-group { width: 100%; max-width: 360px; margin-top: 60px; display: flex; flex-direction: column; gap: 15px; }
+        input { 
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+            padding: 20px; border-radius: 16px; color: #fff; outline: none;
+            backdrop-filter: blur(10px); transition: 0.3s;
+        }
+        input:focus { border-color: var(--gold); background: rgba(255,255,255,0.08); }
 
-        /* CRYPTO SCAN */
-        .crypto-node { width: 200px; height: 200px; border: 1px solid var(--gold); border-radius: 50%; margin: 40px 0; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: 0 0 50px rgba(246, 133, 27, 0.1); }
-        .ring-viz { width: 140px; height: 140px; border: 2px dashed var(--gold); border-radius: 50%; animation: rotate 15s linear infinite; }
-        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .btn-premium {
+            background: var(--gold); color: #000; border: none; padding: 22px;
+            border-radius: 18px; font-weight: bold; letter-spacing: 1px;
+            cursor: pointer; margin-top: 10px; box-shadow: 0 10px 20px rgba(212, 175, 55, 0.2);
+        }
 
-        /* MAIN APP */
-        #app { display: none; height: 100vh; flex-direction: column; }
-        header { height: 70px; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; border-bottom: 1px solid var(--border); background: #000; }
-        .dots { font-size: 24px; cursor: pointer; color: #555; }
-        
-        main { flex: 1; overflow-y: auto; padding: 20px; }
-        footer { height: 85px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--border); background: #050505; padding-bottom: 15px; }
-        .nav-link { display: flex; flex-direction: column; align-items: center; gap: 5px; font-size: 10px; color: #444; text-decoration: none; }
-        .nav-link.active { color: var(--gold); }
+        /* НИЖНЯЯ ПАНЕЛЬ (ПОВЫШЕННАЯ) */
+        footer { 
+            height: 100px; /* Увеличили высоту */
+            padding-bottom: 30px; /* Подняли иконки от края */
+            display: flex; justify-content: space-around; align-items: center;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border); position: fixed; bottom: 0; width: 100%;
+        }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 8px; color: #555; font-size: 11px; font-weight: 500; }
+        .nav-item.active { color: var(--gold); }
+        .nav-item i { font-size: 26px; }
 
-        /* DROPDOWN */
-        #menu-box { position: absolute; right: 20px; top: 70px; background: #111; border: 1px solid var(--border); border-radius: 12px; width: 200px; display: none; flex-direction: column; z-index: 5000; }
-        .m-item { padding: 15px; border-bottom: 1px solid var(--border); font-size: 14px; cursor: pointer; }
+        /* PROFILE STYLE */
+        .profile-card {
+            width: 100%; padding: 25px; background: rgba(255,255,255,0.03);
+            border-radius: 24px; border: 1px solid var(--border);
+            display: flex; align-items: center; gap: 20px; margin-bottom: 30px;
+        }
     </style>
 </head>
 <body>
 
     <div id="splash">
-        <div class="splash-title">BSMLH</div>
-        <div class="splash-sub">Biometric Security Multi-Function Ledger<br>for Humanity</div>
+        <div class="breathing-text">BSMLH</div>
+        <div style="font-size: 7px; color: #444; letter-spacing: 3px; margin-top: 10px; text-align: center;">
+            BIOMETRIC SECURITY MULTI-FUNCTION LEDGER FOR HUMANITY
+        </div>
     </div>
 
     <div id="scr-reg" class="screen">
-        <div class="header-reg"><span class="lang-icon" onclick="showLangs()">🌐</span></div>
-        <h2 id="reg-title">Регистрация</h2>
-        <div class="input-box">
-            <input type="text" id="fn" placeholder="Имя">
-            <input type="text" id="ln" placeholder="Фамилия">
-            <input type="email" id="em" placeholder="E-mail">
-            <input type="tel" id="ph" placeholder="Номер телефона">
-            <button class="btn-main" id="btn-reg" onclick="toSms()">ПОЛУЧИТЬ КОД</button>
+        <div class="lang-select">
+            <span onclick="toggleLangMenu()" style="font-size: 24px; cursor: pointer;">🌐</span>
+            <div id="lang-dropdown">
+                <div class="lang-opt" onclick="changeLang('ru')">Русский</div>
+                <div class="lang-opt" onclick="changeLang('en')">English</div>
+            </div>
+        </div>
+        
+        <h2 id="t-welcome" style="margin-top: 50px; font-weight: 300;">Welcome</h2>
+        
+        <div class="input-group">
+            <input type="text" id="fn" placeholder="First Name">
+            <input type="text" id="ln" placeholder="Last Name">
+            <input type="tel" id="ph" placeholder="Phone Number">
+            <button class="btn-premium" id="btn-next" onclick="toSms()">CONTINUE</button>
         </div>
     </div>
 
     <div id="scr-sms" class="screen">
-        <h2 id="sms-title">SMS Подтверждение</h2>
-        <p style="color:#666; margin-top:10px;">Введите код: 1234</p>
-        <div class="code-container">
-            <input type="text" class="code-input" maxlength="1" id="c1">
-            <input type="text" class="code-input" maxlength="1" id="c2">
-            <input type="text" class="code-input" maxlength="1" id="c3">
-            <input type="text" class="code-input" maxlength="1" id="c4">
+        <h2 id="t-sms" style="margin-top: 50px;">Verification</h2>
+        <div class="input-group">
+            <input type="text" id="sms-code" placeholder="Enter 1234" style="text-align: center; letter-spacing: 10px; font-size: 24px;">
+            <button class="btn-premium" onclick="verifySms()">VERIFY</button>
         </div>
-        <button class="btn-main" id="btn-verify" onclick="verifySms()">ПОДТВЕРДИТЬ</button>
     </div>
 
-    <div id="scr-nfc" class="screen">
-        <h2 style="color:var(--gold); margin-top:40px;">ЗАЩИТА НОВОГО ПОКОЛЕНИЯ</h2>
-        <div class="crypto-node">
-            <div class="ring-viz"></div>
-            <span style="position:absolute; font-size:40px;">💍</span>
-        </div>
-        <p style="color:#666; margin-bottom:20px;">Приложите чип для связки с HUID</p>
-        <button class="btn-main" onclick="scanNfc()">ПРИЛОЖИТЬ КОЛЬЦО</button>
-        <button class="btn-main" style="background:transparent; border:1px solid #222; color:#444;" onclick="finish('vHUID-TEMP')">БЕЗ КОЛЬЦА</button>
-    </div>
-
-    <div id="app">
-        <header>
-            <div style="color:var(--gold); font-size:24px;">☰</div>
-            <div style="text-align:center;">
-                <span style="color:var(--gold); font-weight:bold; letter-spacing:1px;">BSMLH</span>
-                <span style="display:block; font-size:5px; color:#555; text-transform:uppercase;">Biometric Security Ledger for Humanity</span>
-            </div>
-            <div class="dots" onclick="toggleDots()">⋮</div>
+    <div id="main-app" style="display: none; height: 100vh; flex-direction: column;">
+        <header style="height: 70px; display: flex; justify-content: space-between; align-items: center; padding: 0 25px; border-bottom: 1px solid var(--border);">
+            <div style="color: var(--gold); font-size: 22px;">☰</div>
+            <div style="font-weight: bold; letter-spacing: 2px;">BSMLH</div>
+            <div style="font-size: 22px;">⋮</div>
         </header>
 
-        <div id="menu-box">
-            <div class="m-item" onclick="showLangs()">🌐 Languages</div>
-            <div class="m-item" onclick="alert('Scan...')">🔳 Scan QR</div>
-            <div class="m-item" onclick="alert('My QR...')">👤 My QR Code</div>
-        </div>
-
-        <main>
-            <div id="t-chat" class="tab active-tab">
-                <div style="display:flex; align-items:center; gap:15px; padding:15px; border-bottom:1px solid #111;">
-                    <div style="width:45px; height:45px; background:#222; border-radius:50%;"></div>
-                    <div><b>AI Assistant</b><br><small style="color:#444">Ready to assist</small></div>
+        <main style="flex: 1; padding: 25px;">
+            <div id="tab-chat" class="tab-content active-tab">
+                <p style="color: #444;">No active messages</p>
+            </div>
+            
+            <div id="tab-profile" class="tab-content" style="display: none;">
+                <div class="profile-card">
+                    <div style="width: 60px; height: 60px; background: #222; border-radius: 15px; border: 1px solid var(--gold);"></div>
+                    <div>
+                        <h3 id="p-full-name">User Name</h3>
+                        <p style="font-size: 11px; color: #555;">HUID-PENDING</p>
+                    </div>
                 </div>
+                <button class="btn-premium" style="background: #331111; color: #ff4444; width: 100%;" onclick="logout()">LOGOUT</button>
             </div>
         </main>
 
         <footer>
-            <div class="nav-link active"><i>💬</i>CHAT</div>
-            <div class="nav-link"><i>🗺️</i>MAPS</div>
-            <div class="nav-link"><i>🚀</i>HUB</div>
-            <div class="nav-link" onclick="logout()"><i>👤</i>LOGOUT</div>
+            <div class="nav-item active" onclick="showTab('chat', this)"><i>💬</i>CHAT</div>
+            <div class="nav-item" onclick="showTab('maps', this)"><i>🗺️</i>MAPS</div>
+            <div class="nav-item" onclick="showTab('hub', this)"><i>🚀</i>HUB</div>
+            <div class="nav-item" onclick="showTab('profile', this)"><i>👤</i>PROFILE</div>
         </footer>
     </div>
 
     <script>
-        // Splash screen timer
+        // Splash Screen Logic
         setTimeout(() => {
-            document.getElementById('splash').style.opacity = '0';
-            setTimeout(() => {
-                document.getElementById('splash').style.display = 'none';
-                checkSession();
-            }, 1000);
-        }, 3000);
+            const s = document.getElementById('splash');
+            s.style.opacity = '0';
+            setTimeout(() => { s.style.display = 'none'; checkSession(); }, 1500);
+        }, 4000);
+
+        function toggleLangMenu() {
+            const d = document.getElementById('lang-dropdown');
+            d.style.display = d.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function changeLang(l) {
+            const t = {
+                ru: { welcome: "Добро пожаловать", fn: "Имя", ln: "Фамилия", ph: "Телефон", next: "ДАЛЕЕ", sms: "Код подтверждения" },
+                en: { welcome: "Welcome", fn: "First Name", ln: "Last Name", ph: "Phone Number", next: "CONTINUE", sms: "Verification" }
+            };
+            document.getElementById('t-welcome').innerText = t[l].welcome;
+            document.getElementById('fn').placeholder = t[l].fn;
+            document.getElementById('ln').placeholder = t[l].ln;
+            document.getElementById('ph').placeholder = t[l].ph;
+            document.getElementById('btn-next').innerText = t[l].next;
+            document.getElementById('t-sms').innerText = t[l].sms;
+            toggleLangMenu();
+        }
 
         function checkSession() {
-            if(localStorage.getItem('verified') === 'true') {
-                showApp();
-            } else {
-                document.getElementById('scr-reg').classList.add('active-screen');
-            }
+            if(localStorage.getItem('auth')) { showApp(); } 
+            else { document.getElementById('scr-reg').classList.add('active-screen'); }
         }
 
         function toSms() {
-            document.getElementById('scr-reg').classList.remove('active-screen');
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
             document.getElementById('scr-sms').classList.add('active-screen');
         }
 
         function verifySms() {
-            const code = document.getElementById('c1').value + document.getElementById('c2').value + document.getElementById('c3').value + document.getElementById('c4').value;
-            if(code === "1234") {
-                document.getElementById('scr-sms').classList.remove('active-screen');
-                document.getElementById('scr-nfc').classList.add('active-screen');
-            } else {
-                alert("Неверный код!");
+            if(document.getElementById('sms-code').value === '1234') {
+                localStorage.setItem('auth', 'true');
+                localStorage.setItem('name', document.getElementById('fn').value + ' ' + document.getElementById('ln').value);
+                showApp();
             }
-        }
-
-        function finish(huid) {
-            localStorage.setItem('verified', 'true');
-            localStorage.setItem('name', document.getElementById('fn').value);
-            localStorage.setItem('huid', huid);
-            showApp();
         }
 
         function showApp() {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen'));
-            document.getElementById('app').style.display = 'flex';
+            document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+            document.getElementById('main-app').style.display = 'flex';
+            document.getElementById('p-full-name').innerText = localStorage.getItem('name') || "User";
+        }
+
+        function showTab(tab, el) {
+            document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('tab-' + tab).style.display = 'block';
+            el.classList.add('active');
         }
 
         function logout() { localStorage.clear(); location.reload(); }
-        function toggleDots() { 
-            const m = document.getElementById('menu-box');
-            m.style.display = (m.style.display === 'flex') ? 'none' : 'flex';
-        }
-
-        function showLangs() {
-            const lang = prompt("Select Language: EN, RU, AR");
-            if(lang.toLowerCase() === 'en') {
-                document.getElementById('reg-title').innerText = "Registration";
-                document.getElementById('btn-reg').innerText = "GET CODE";
-                document.getElementById('sms-title').innerText = "SMS Verification";
-                document.getElementById('btn-verify').innerText = "VERIFY";
-            }
-        }
-        
-        async function scanNfc() {
-            if ('NDEFReader' in window) {
-                try {
-                    const ndef = new NDEFReader();
-                    await ndef.scan();
-                    ndef.onreading = event => finish("HUID-" + event.serialNumber.toUpperCase());
-                } catch (e) { alert("NFC Error"); }
-            } else { finish("vHUID-TEMP"); }
-        }
     </script>
 </body>
 </html>
