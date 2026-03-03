@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BSMLH | The Fortress Console</title>
+    <style>
+        :root { --bg: #000; --text: #fff; --gold: #f6851b; --dim: #1a1a1a; --border: #333; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: -apple-system, sans-serif; }
+        body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
+
+        /* --- ВНЕШНИЕ ВОРОТА (РЕГИСТРАЦИЯ) --- */
+        #gate-screen { position: fixed; inset: 0; background: #000; z-index: 1000; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 30px; }
+        .logo-big { font-size: 40px; letter-spacing: 12px; margin-bottom: 60px; font-weight: 200; }
+        .input-group { width: 100%; max-width: 300px; display: flex; flex-direction: column; gap: 15px; }
+        input { background: var(--dim); border: 1px solid var(--border); padding: 15px; border-radius: 10px; color: #fff; outline: none; }
+        .btn-gold { background: var(--gold); color: #000; border: none; padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+        
+        /* --- ОСНОВНАЯ КОНСОЛЬ --- */
+        #fortress-console { display: none; height: 100vh; flex-direction: column; }
+
+        /* Верхняя панель */
+        header { height: 60px; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; border-bottom: 1px solid var(--border); }
+        .icon-btn { font-size: 20px; cursor: pointer; color: var(--gold); }
+
+        /* Скрытая панель (Drawer) */
+        #module-drawer { height: 0; background: var(--dim); overflow: hidden; transition: 0.3s; display: flex; flex-wrap: wrap; gap: 20px; padding: 0 20px; align-content: flex-start; }
+        #module-drawer.open { height: 180px; padding: 20px; border-bottom: 1px solid var(--gold); }
+        .mod-icon { width: 60px; height: 60px; background: #333; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; text-align: center; }
+
+        /* Центральная область */
+        main { flex: 1; padding: 20px; display: flex; flex-direction: column; overflow-y: auto; }
+        .chat-area { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; gap: 10px; color: #888; }
+
+        /* Нижняя панель */
+        footer { height: 80px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--border); background: #050505; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 5px; font-size: 10px; color: #666; cursor: pointer; transition: 0.2s; }
+        .nav-item.active { color: var(--gold); }
+        .nav-item i { font-size: 22px; margin-bottom: 2px; }
+
+        /* Контент разделов */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+    </style>
+</head>
+<body>
+
+    <div id="gate-screen">
+        <div class="logo-big">BSMLH</div>
+        <div class="input-group" id="reg-form">
+            <input type="text" id="user-name" placeholder="Имя">
+            <input type="text" id="user-surname" placeholder="Фамилия">
+            <button class="btn-gold" onclick="finishRegistration()">СОЗДАТЬ ЛИЧНОСТЬ</button>
+        </div>
+    </div>
+
+    <div id="fortress-console">
+        <header>
+            <div class="icon-btn" onclick="toggleSidebar()">☰</div>
+            <div style="font-size: 12px; letter-spacing: 2px;">SECURITY & ACCESS</div>
+            <div style="display: flex; gap: 15px;">
+                <span class="icon-btn">🔍</span>
+                <span class="icon-btn">🌐</span>
+            </div>
+        </header>
+
+        <div id="module-drawer">
+            <div class="mod-icon">✈️<br>Авиа</div>
+            <div class="mod-icon">📄<br>Контракт</div>
+            <div class="mod-icon">➕<br>Добавить</div>
+        </div>
+        <div style="text-align: center; font-size: 10px; color: #333; cursor: pointer;" onclick="toggleDrawer()">▼ MODULES ▼</div>
+
+        <main id="content-manager">
+            
+            <div id="tab-wall" class="tab-content active">
+                <h3 style="color: var(--gold)">WALL STATUS</h3>
+                <div style="margin-top:20px; background: #111; padding: 15px; border-radius: 10px;">
+                    <p>HUID: <span id="display-huid" style="color:var(--gold)">Генерация...</span></p>
+                    <p style="margin-top:10px;">Статус: <span style="color: #ff4545;">Странник (Виртуальный)</span></p>
+                    <small style="color: #555;">Ожидание активации кольца NFC</small>
+                </div>
+            </div>
+
+            <div id="tab-workshop" class="tab-content">
+                <h3 style="color: var(--gold)">WORKSHOP</h3>
+                <p style="color: #888; margin: 10px 0;">Ваша патентная мастерская</p>
+                <textarea style="width:100%; height:150px; background:#111; border:1px solid #333; color:white; padding:10px; border-radius:10px; margin-bottom:10px;" placeholder="Опишите вашу идею..."></textarea>
+                <button class="btn-gold" style="width:100%">ЗАБЕТОНИРОВАТЬ</button>
+            </div>
+
+            <div id="tab-hub" class="tab-content"><h3>PROJECT HUB</h3></div>
+            <div id="tab-vault" class="tab-content"><h3>VAULT SECURE</h3></div>
+
+        </main>
+
+        <footer>
+            <div class="nav-item active" onclick="showTab('wall', this)"><i>🛡️</i>WALL</div>
+            <div class="nav-item" onclick="showTab('workshop', this)"><i>🛠️</i>WORKSHOP</div>
+            <div class="nav-item" onclick="showTab('hub', this)"><i>🚀</i>HUB</div>
+            <div class="nav-item" onclick="showTab('vault', this)"><i>🔒</i>VAULT</div>
+        </footer>
+    </div>
+
+    <script>
+        function finishRegistration() {
+            const name = document.getElementById('user-name').value;
+            if(!name) return alert("Введите имя");
+            
+            // Сохраняем "виртуальный" HUID
+            const huid = "vHUID-" + Math.random().toString(36).substr(2, 9).toUpperCase();
+            localStorage.setItem('bs_huid', huid);
+            localStorage.setItem('bs_name', name);
+            
+            document.getElementById('display-huid').innerText = huid;
+            
+            // Убираем ворота, открываем консоль
+            document.getElementById('gate-screen').style.display = 'none';
+            document.getElementById('fortress-console').style.display = 'flex';
+        }
+
+        function toggleDrawer() {
+            document.getElementById('module-drawer').classList.toggle('open');
+        }
+
+        function showTab(tabName, el) {
+            // Убираем активный класс у всех контентов
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            // Убираем активный класс у всех кнопок навигации
+            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+            
+            // Активируем нужные
+            document.getElementById('tab-' + tabName).classList.add('active');
+            el.classList.add('active');
+        }
+
+        function toggleSidebar() {
+            alert("История диалогов (ChatGPT style) откроется здесь");
+        }
+
+        // Авто-вход если уже регистрировался
+        window.onload = () => {
+            if(localStorage.getItem('bs_huid')) {
+                document.getElementById('display-huid').innerText = localStorage.getItem('bs_huid');
+                document.getElementById('gate-screen').style.display = 'none';
+                document.getElementById('fortress-console').style.display = 'flex';
+            }
+        }
+    </script>
+</body>
+</html>
