@@ -3,53 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BSMLH | Terminal</title>
+    <title>BSMLH | Terminal v12</title>
     <style>
-        :root { --gold: #d4af37; --bg: #000; --text: #fff; --panel: #111; --border: #222; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: monospace; }
+        :root { --gold: #d4af37; --bg: #000; --text: #fff; --panel: #0a0a0a; --border: #1a1a1a; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Courier New', monospace; }
         body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
 
-        /* МИНИМАЛИСТИЧНАЯ ЗАСТАВКА */
+        /* CSS-ЗАСТАВКА (СКРЫВАЕТСЯ САМА БЕЗ СКРИПТОВ) */
         #splash {
             position: fixed; inset: 0; z-index: 99999;
             background: #000; display: flex; align-items: center; justify-content: center;
+            animation: hideSplash 0.5s forwards;
+            animation-delay: 3s; /* Исчезнет ровно через 3 секунды */
+            pointer-events: none;
         }
-        .logo-txt { font-size: 45px; font-weight: bold; letter-spacing: 15px; color: var(--text); }
+        @keyframes hideSplash {
+            to { opacity: 0; visibility: hidden; }
+        }
+        .logo-txt { font-size: 40px; font-weight: bold; letter-spacing: 15px; color: #fff; text-shadow: 0 0 10px #fff; }
 
         /* ЭКРАНЫ */
         .screen { position: fixed; inset: 0; background: var(--bg); z-index: 1000; display: none; flex-direction: column; align-items: center; padding: 40px 20px; }
         .active-screen { display: flex; }
 
-        .lang-switch { position: absolute; top: 30px; right: 20px; color: var(--gold); border: 1px solid var(--gold); padding: 5px 10px; cursor: pointer; }
+        .lang-node { position: absolute; top: 30px; right: 20px; color: var(--gold); border: 1px solid var(--gold); padding: 5px 12px; cursor: pointer; font-size: 12px; }
 
-        .f-group { width: 100%; max-width: 320px; margin-top: 50px; display: flex; flex-direction: column; gap: 10px; }
-        input { background: var(--panel); border: 1px solid var(--border); padding: 15px; color: #fff; outline: none; }
-        .btn-ui { background: var(--gold); color: #000; border: none; padding: 18px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .form-ui { width: 100%; max-width: 320px; margin-top: 60px; display: flex; flex-direction: column; gap: 15px; }
+        input { background: #050505; border: 1px solid var(--border); padding: 18px; color: #fff; outline: none; border-radius: 0; font-size: 14px; }
+        input:focus { border-color: var(--gold); }
+        .btn-entry { background: var(--gold); color: #000; border: none; padding: 20px; font-weight: bold; cursor: pointer; letter-spacing: 2px; }
 
-        /* КОНСОЛЬ */
-        #console { display: none; height: 100vh; flex-direction: column; }
-        header { height: 60px; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; border-bottom: 1px solid var(--border); }
+        /* ГЛАВНАЯ КОНСОЛЬ */
+        #main { display: none; height: 100vh; flex-direction: column; }
+        header { height: 65px; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; border-bottom: 1px solid var(--border); }
 
-        /* КАРТА (ТЕКСТОВАЯ) */
-        .map-static {
-            width: 100%; height: 250px; border: 1px solid var(--border); 
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: #050505; color: var(--gold); font-size: 12px; line-height: 2;
-        }
+        .content { flex: 1; overflow-y: auto; padding: 20px; }
+        .chat-log { display: flex; flex-direction: column; gap: 12px; }
+        .line { padding: 10px; border: 1px solid var(--border); font-size: 13px; max-width: 90%; word-break: break-all; }
+        .line.bot { border-left: 4px solid var(--gold); background: #050505; }
+        .line.me { align-self: flex-end; background: #111; color: var(--gold); }
 
-        /* ЧАТ */
-        .chat-box { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
-        .msg { padding: 10px 15px; border: 1px solid var(--border); max-width: 90%; font-size: 13px; }
-        .msg.ai { align-self: flex-start; border-left: 3px solid var(--gold); }
-        .msg.user { align-self: flex-end; background: #222; }
+        /* ФУТЕР */
+        footer { height: 90px; padding-bottom: 25px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--border); background: #000; }
+        .nav-link { color: #444; font-size: 13px; font-weight: bold; text-decoration: none; cursor: pointer; text-transform: uppercase; }
+        .nav-link.on { color: var(--gold); border-bottom: 1px solid var(--gold); }
 
-        /* ФУТЕР (ТЕКСТОВЫЙ) */
-        footer { height: 80px; padding-bottom: 20px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--border); background: #000; }
-        .nav-btn { color: #444; font-size: 12px; cursor: pointer; font-weight: bold; }
-        .nav-btn.active { color: var(--gold); border-bottom: 2px solid var(--gold); }
-
-        .entry-bar { padding: 15px; display: flex; gap: 10px; border-top: 1px solid var(--border); }
-        .entry-bar input { flex: 1; padding: 10px; }
+        .input-bar { padding: 15px; display: flex; gap: 10px; border-top: 1px solid var(--border); }
+        .input-bar input { flex: 1; padding: 10px; }
     </style>
 </head>
 <body>
@@ -59,102 +59,94 @@
     </div>
 
     <div id="scr-auth" class="screen active-screen">
-        <div class="lang-switch" onclick="chLang()">LANG: <span id="l-cur">EN</span></div>
-        <h2 id="l-welcome" style="margin-top:40px;">[ ACCESS_REQUIRED ]</h2>
-        <div class="f-group">
-            <input type="text" id="fn" placeholder="FIRST NAME">
-            <input type="text" id="ln" placeholder="LAST NAME">
-            <input type="tel" id="ph" placeholder="PHONE">
-            <button class="btn-ui" id="l-btn" onclick="openSys()">INITIALIZE</button>
+        <div class="lang-node" onclick="setL()">LANG: <span id="cur-l">EN</span></div>
+        <h2 id="t-head" style="margin-top:40px; letter-spacing:2px;">[ AUTH_REQUIRED ]</h2>
+        <div class="form-ui">
+            <input type="text" id="i1" placeholder="NAME">
+            <input type="text" id="i2" placeholder="SURNAME">
+            <input type="tel" id="i3" placeholder="PHONE">
+            <button class="btn-entry" id="t-btn" onclick="openApp()">EXECUTE</button>
         </div>
     </div>
 
-    <div id="console">
+    <div id="main">
         <header>
-            <div style="color:var(--gold)">=</div>
-            <div style="letter-spacing:5px; font-weight:bold;">BSMLH</div>
-            <div onclick="location.reload()">X</div>
+            <div style="color:var(--gold)">MENU</div>
+            <div style="letter-spacing:6px; font-weight:bold;">BSMLH</div>
+            <div onclick="location.reload()">EXIT</div>
         </header>
 
-        <main style="flex:1; display:flex; flex-direction:column; overflow:hidden;">
-            <div id="v-chat" class="chat-box">
-                <div class="msg ai" id="l-greet">SYSTEM: AI_MODULE_ONLINE. READY.</div>
+        <div class="content">
+            <div id="v-chat" class="chat-log">
+                <div class="line bot" id="t-greet">SECURE_LINK: READY. AI_ASSISTANT: ONLINE.</div>
             </div>
-            <div class="entry-bar" id="c-input">
-                <input type="text" id="m-val" placeholder="TYPE...">
-                <button onclick="send()" style="background:var(--gold); border:none; padding:0 15px; font-weight:bold;">SEND</button>
-            </div>
-
-            <div id="v-maps" style="display:none; padding:20px;">
-                <div class="map-static">
-                    <div>[ SECTOR_01: ACTIVE ]</div>
-                    <div>[ COORDINATES: 55.75 | 37.61 ]</div>
-                    <div style="color:#222">----------------------</div>
-                    <div>STATUS: ENCRYPTED</div>
+            
+            <div id="v-maps" style="display:none; text-align:center;">
+                <div style="border:1px solid var(--border); padding:40px; background:#050505; color:var(--gold);">
+                    [ GRID_MAP_ACTIVE ]<br><br>
+                    LAT: 43.2389<br>
+                    LON: 76.8897<br><br>
+                    STATUS: ENCRYPTED
                 </div>
-                <h3 id="l-map-h" style="margin-top:20px; font-weight:normal;">> DIGITAL_LEDGER_MAP</h3>
             </div>
-        </main>
+        </div>
+
+        <div class="input-bar" id="bar">
+            <input type="text" id="msg" placeholder=">_">
+            <button onclick="send()" style="background:var(--gold); border:none; padding:0 15px; font-weight:bold;">></button>
+        </div>
 
         <footer>
-            <div class="nav-btn active" onclick="nav('chat', this)">CHAT</div>
-            <div class="nav-btn" onclick="nav('maps', this)">MAPS</div>
-            <div class="nav-btn">HUB</div>
-            <div class="nav-btn" onclick="location.reload()">EXIT</div>
+            <div class="nav-link on" id="n1" onclick="nav('chat')">CHAT</div>
+            <div class="nav-link" id="n2" onclick="nav('maps')">MAPS</div>
+            <div class="nav-link" id="n3">HUB</div>
+            <div class="nav-link" id="n4" onclick="location.reload()">OFF</div>
         </footer>
     </div>
 
     <script>
-        let lang = 'EN';
-        const ui = {
-            'EN': { welcome: "[ ACCESS_REQUIRED ]", btn: "INITIALIZE", greet: "SYSTEM: AI_MODULE_ONLINE. READY.", maph: "> DIGITAL_LEDGER_MAP", p1: "FIRST NAME", p2: "LAST NAME", p3: "PHONE" },
-            'RU': { welcome: "[ ТРЕБУЕТСЯ ДОСТУП ]", btn: "ИНИЦИАЛИЗАЦИЯ", greet: "СИСТЕМА: ИИ_МОДУЛЬ_АКТИВЕН.", maph: "> КАРТА_РЕЕСТРА", p1: "ИМЯ", p2: "ФАМИЛИЯ", p3: "ТЕЛЕФОН" }
+        let L = 'EN';
+        const D = {
+            'EN': { h: "[ AUTH_REQUIRED ]", b: "EXECUTE", g: "SECURE_LINK: READY. AI_ASSISTANT: ONLINE.", p1: "NAME", p2: "SURNAME", p3: "PHONE" },
+            'RU': { h: "[ ТРЕБУЕТСЯ ВХОД ]", b: "ЗАПУСК", g: "СВЯЗЬ УСТАНОВЛЕНА. ИИ ГОТОВ.", p1: "ИМЯ", p2: "ФАМИЛИЯ", p3: "ТЕЛЕФОН" }
         };
 
-        // ГАРАНТИРОВАННОЕ УДАЛЕНИЕ ЗАСТАВКИ ЧЕРЕЗ 2 СЕКУНДЫ
-        setTimeout(() => {
-            const s = document.getElementById('splash');
-            if(s) s.style.display = 'none';
-        }, 2000);
-
-        function chLang() {
-            lang = lang === 'EN' ? 'RU' : 'EN';
-            document.getElementById('l-cur').innerText = lang;
-            const d = ui[lang];
-            document.getElementById('l-welcome').innerText = d.welcome;
-            document.getElementById('l-btn').innerText = d.btn;
-            document.getElementById('l-greet').innerText = d.greet;
-            document.getElementById('l-map-h').innerText = d.maph;
-            document.getElementById('fn').placeholder = d.p1;
-            document.getElementById('ln').placeholder = d.p2;
-            document.getElementById('ph').placeholder = d.p3;
+        function setL() {
+            L = L === 'EN' ? 'RU' : 'EN';
+            document.getElementById('cur-l').innerText = L;
+            document.getElementById('t-head').innerText = D[L].h;
+            document.getElementById('t-btn').innerText = D[L].b;
+            document.getElementById('t-greet').innerText = D[L].g;
+            document.getElementById('i1').placeholder = D[L].p1;
+            document.getElementById('i2').placeholder = D[L].p2;
+            document.getElementById('i3').placeholder = D[L].p3;
         }
 
-        function openSys() {
+        function openApp() {
             document.getElementById('scr-auth').style.display = 'none';
-            document.getElementById('console').style.display = 'flex';
+            document.getElementById('main').style.display = 'flex';
         }
 
-        function nav(t, el) {
-            document.getElementById('v-chat').style.display = (t === 'chat' ? 'flex' : 'none');
-            document.getElementById('c-input').style.display = (t === 'chat' ? 'flex' : 'none');
-            document.getElementById('v-maps').style.display = (t === 'maps' ? 'block' : 'none');
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            el.classList.add('active');
+        function nav(mode) {
+            document.getElementById('v-chat').style.display = (mode === 'chat' ? 'flex' : 'none');
+            document.getElementById('bar').style.display = (mode === 'chat' ? 'flex' : 'none');
+            document.getElementById('v-maps').style.display = (mode === 'maps' ? 'block' : 'none');
+            document.getElementById('n1').className = 'nav-link' + (mode === 'chat' ? ' on' : '');
+            document.getElementById('n2').className = 'nav-link' + (mode === 'maps' ? ' on' : '');
         }
 
         function send() {
-            const i = document.getElementById('m-val');
+            const i = document.getElementById('msg');
             if(!i.value) return;
-            const b = document.getElementById('v-chat');
-            b.innerHTML += <div class="msg user">> ${i.value}</div>;
-            const v = i.value;
+            const log = document.getElementById('v-chat');
+            log.innerHTML += <div class="line me">> ${i.value}</div>;
+            const val = i.value;
             i.value = '';
             setTimeout(() => {
-                const r = lang === 'EN' ? "PROCESSING DATA: " : "ОБРАБОТКА ДАННЫХ: ";
-                b.innerHTML += <div class="msg ai">${r} "${v.toUpperCase()}"... [OK]</div>;
-                b.scrollTop = b.scrollHeight;
-            }, 500);
+                const res = L === 'EN' ? "DATA_RECEIVED: " : "ДАННЫЕ ПОЛУЧЕНЫ: ";
+                log.innerHTML += <div class="line bot">${res} ${val.toUpperCase()} [OK]</div>;
+                log.parentElement.scrollTop = log.parentElement.scrollHeight;
+            }, 400);
         }
     </script>
 </body>
