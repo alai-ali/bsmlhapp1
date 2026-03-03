@@ -3,183 +3,163 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BSMLH | Final Stable v18</title>
+    <title>BSMLH | v19 NoSplash</title>
     <style>
-        :root { --gold: #f6851b; --bg: #000; --border: #333; }
+        :root { --gold: #f6851b; --bg: #000; --panel: #0d0d0d; --border: #333; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: #000; color: #fff; height: 100vh; width: 100vw; overflow: hidden; position: fixed; }
+        body { background: #000; color: #fff; height: 100vh; overflow: hidden; width: 100%; position: fixed; }
 
-        /* ЗАСТАВКА - БЕЛЫЕ БУКВЫ (БЕЗ АНИМАЦИИ) */
-        #splash {
-            position: fixed; inset: 0; z-index: 99999; background: #000;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            animation: killSplash 0.5s forwards 3s; /* ИСЧЕЗНЕТ САМА ЧЕРЕЗ 3 СЕКУНДЫ */
-        }
-        @keyframes killSplash { 
-            0% { opacity: 1; visibility: visible; }
-            99% { opacity: 0; visibility: visible; }
-            100% { opacity: 0; visibility: hidden; display: none; } 
-        }
-        .s-title { font-size: 50px; font-weight: 900; letter-spacing: 12px; color: #fff; margin-bottom: 15px; }
-        .s-sub { font-size: 11px; color: #fff; font-weight: bold; text-align: center; max-width: 80%; line-height: 1.4; text-transform: uppercase; }
-
-        /* ЭКРАНЫ */
-        .screen { position: absolute; inset: 0; background: #000; z-index: 1000; display: none; flex-direction: column; align-items: center; padding: 20px; overflow-y: auto; }
-        .active-screen { display: flex; }
+        /* ЭКРАН РЕГИСТРАЦИИ (СРАЗУ) */
+        #scr-reg { position: fixed; inset: 0; background: #000; z-index: 2000; display: flex; flex-direction: column; align-items: center; padding: 20px; overflow-y: auto; }
 
         /* ВЫБОР ЯЗЫКА */
-        .lang-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; width: 100%; max-width: 340px; margin: 20px 0; }
-        .l-btn { border: 1px solid var(--border); padding: 12px; text-align: center; font-size: 12px; font-weight: bold; cursor: pointer; color: #666; border-radius: 8px; }
+        .lang-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; width: 100%; max-width: 340px; margin: 20px 0; }
+        .l-btn { border: 1px solid var(--border); padding: 12px; text-align: center; font-size: 13px; font-weight: bold; cursor: pointer; color: #666; border-radius: 8px; }
         .l-btn.on { border-color: var(--gold); color: var(--gold); background: rgba(246, 133, 27, 0.1); }
 
-        /* ИНПУТЫ */
-        .f-box { width: 100%; max-width: 340px; display: flex; flex-direction: column; gap: 12px; }
-        input { background: #111 !important; border: 1px solid var(--border); padding: 20px; color: #fff !important; border-radius: 12px; font-size: 16px; outline: none; -webkit-appearance: none; }
-        input:focus { border-color: var(--gold); background: #151515 !important; }
-        .btn-m { background: var(--gold); color: #000; border: none; padding: 22px; border-radius: 12px; font-weight: 900; cursor: pointer; text-transform: uppercase; margin-top: 10px; width: 100%; }
+        /* ИНПУТЫ И КНОПКИ */
+        .f-box { width: 100%; max-width: 340px; display: flex; flex-direction: column; gap: 15px; }
+        input { background: #111 !important; border: 1px solid var(--border); padding: 20px; color: #fff !important; border-radius: 12px; font-size: 16px; outline: none; width: 100%; }
+        .btn-m { background: var(--gold); color: #000; border: none; padding: 22px; border-radius: 12px; font-weight: 900; cursor: pointer; text-transform: uppercase; width: 100%; }
 
-        /* SIDEBAR */
-        #sidebar { position: fixed; left: -280px; top: 0; bottom: 0; width: 280px; background: #0d0d0d; z-index: 6000; transition: 0.3s; border-right: 1px solid var(--border); padding: 20px; }
-        #sidebar.open { left: 0; }
-        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 5500; display: none; }
-        .h-item { padding: 15px; border-bottom: 1px solid #1a1a1a; font-size: 14px; color: #888; cursor: pointer; }
-
-        /* APP */
-        #app { display: none; height: 100vh; flex-direction: column; background: #000; }
+        /* ОСНОВНОЙ ИНТЕРФЕЙС */
+        #app { display: none; height: 100vh; flex-direction: column; }
         header { height: 70px; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; border-bottom: 1px solid var(--border); }
         main { flex: 1; overflow-y: auto; padding: 20px; -webkit-overflow-scrolling: touch; }
-        
-        .msg { padding: 14px; border-radius: 12px; font-size: 14px; max-width: 85%; margin-bottom: 10px; line-height: 1.4; }
+
+        /* БОКОВОЕ МЕНЮ */
+        #sidebar { position: fixed; left: -280px; top: 0; bottom: 0; width: 280px; background: #0a0a0a; z-index: 6000; transition: 0.3s; border-right: 1px solid var(--border); padding: 25px; }
+        #sidebar.open { left: 0; }
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 5500; display: none; }
+        .h-item { padding: 15px; border-bottom: 1px solid #1a1a1a; font-size: 14px; color: #777; cursor: pointer; }
+
+        /* ЧАТ */
+        .msg { padding: 15px; border-radius: 12px; font-size: 14px; max-width: 80%; margin-bottom: 12px; line-height: 1.4; }
         .msg.ai { background: #111; border-left: 4px solid var(--gold); align-self: flex-start; }
         .msg.u { background: var(--gold); color: #000; align-self: flex-end; font-weight: bold; margin-left: auto; }
 
+        /* ФУТЕР */
         footer { height: 105px; padding-bottom: 40px; display: flex; justify-content: space-around; align-items: center; background: #050505; border-top: 1px solid var(--border); }
-        .nav-i { color: #444; font-size: 10px; font-weight: 800; text-transform: uppercase; cursor: pointer; }
+        .nav-i { color: #444; font-size: 11px; font-weight: 800; text-transform: uppercase; cursor: pointer; }
         .nav-i.active { color: var(--gold); }
 
         .in-bar { padding: 15px; display: flex; gap: 10px; background: #000; border-top: 1px solid var(--border); }
-        .in-bar input { flex: 1; padding: 12px; border-radius: 10px; background: #111; border: 1px solid var(--border); }
     </style>
 </head>
 <body>
 
-    <div id="splash">
-        <div class="s-title">BSMLH</div>
-        <div class="s-sub">BIOMETRIC SECURITY MULTI-FUNCTION LEDGER FOR HUMANITY</div>
-    </div>
-
-    <div id="scr-reg" class="screen active-screen">
+    <div id="scr-reg">
         <div class="lang-grid">
-            <div id="l-RU" class="l-btn on" onclick="setLang('RU')">RU</div>
-            <div id="l-EN" class="l-btn" onclick="setLang('EN')">EN</div>
-            <div id="l-AR" class="l-btn" onclick="setLang('AR')">AR</div>
-            <div id="l-CH" class="l-btn" onclick="setLang('CH')">CH</div>
+            <div id="l-RU" class="l-btn on" onclick="setL('RU')">RU</div>
+            <div id="l-EN" class="l-btn" onclick="setL('EN')">EN</div>
+            <div id="l-AR" class="l-btn" onclick="setL('AR')">AR</div>
+            <div id="l-CH" class="l-btn" onclick="setL('CH')">CH</div>
         </div>
-        <h2 id="h-reg" style="margin-bottom:20px;">РЕГИСТРАЦИЯ</h2>
+        <h2 id="h-reg" style="margin: 10px 0 25px 0; letter-spacing: 1px;">РЕГИСТРАЦИЯ</h2>
         <div class="f-box">
-            <input type="text" id="in-f" placeholder="ИМЯ" autocomplete="off">
-            <input type="text" id="in-l" placeholder="ФАМИЛИЯ" autocomplete="off">
-            <input type="tel" id="in-p" placeholder="ТЕЛЕФОН" autocomplete="off">
-            <button class="btn-m" id="b-reg" onclick="launchApp()">ИНИЦИАЛИЗАЦИЯ</button>
+            <input type="text" id="fn" placeholder="ИМЯ" autocomplete="off">
+            <input type="text" id="ln" placeholder="ФАМИЛИЯ" autocomplete="off">
+            <input type="tel" id="ph" placeholder="ТЕЛЕФОН" autocomplete="off">
+            <button class="btn-m" id="b-reg" onclick="start()">ИНИЦИАЛИЗАЦИЯ</button>
         </div>
     </div>
 
     <div id="sidebar">
-        <h3 style="color:var(--gold); margin-bottom:20px;">HISTORY</h3>
+        <h3 style="color:var(--gold); margin-bottom:20px; letter-spacing: 2px;">HISTORY</h3>
         <div id="h-list"></div>
     </div>
-    <div class="overlay" id="over" onclick="toggleSide()"></div>
+    <div class="overlay" id="over" onclick="menu()"></div>
 
     <div id="app">
         <header>
-            <div onclick="toggleSide()" style="font-size:26px; color:var(--gold); cursor:pointer;">☰</div>
-            <div style="font-weight:900; letter-spacing:4px;">BSMLH</div>
+            <div onclick="menu()" style="font-size:26px; color:var(--gold); cursor:pointer;">☰</div>
+            <div style="font-weight:900; letter-spacing:4px; font-size: 18px;">BSMLH</div>
             <div style="color:#222; font-size:22px;">⋮</div>
         </header>
+
         <main id="scroller">
-            <div id="view-chat" style="display: flex; flex-direction: column;">
-                <div class="msg ai" id="ai-greet">СИСТЕМА: ГОТОВА К РАБОТЕ.</div>
+            <div id="v-chat" style="display: flex; flex-direction: column;">
+                <div class="msg ai" id="ai-g">СИСТЕМА: ОНЛАЙН.</div>
             </div>
-            <div id="view-prof" style="display:none; text-align:center;">
+            <div id="v-prof" style="display:none; text-align:center;">
                 <div style="background:#0d0d0d; padding:30px; border-radius:20px; border:1px solid var(--border);">
-                    <div style="font-size:40px; margin-bottom:15px;">👤</div>
-                    <h3 id="u-display-name">USER</h3>
-                    <p style="color:var(--gold); font-size:12px; margin-top:10px; font-family: monospace;">STATUS: vHUID-ENCRYPTED</p>
-                    <button class="btn-m" style="background: transparent; border: 1px solid var(--border); color: #fff;" onclick="location.reload()">LOGOUT</button>
+                    <div style="font-size:50px; margin-bottom:15px;">👤</div>
+                    <h3 id="u-name" style="text-transform: uppercase;">USER</h3>
+                    <p style="color:var(--gold); font-size:12px; margin-top:10px; font-family: monospace;">STATUS: vHUID-SECURE</p>
+                    <button class="btn-m" style="margin-top:30px; background: transparent; border: 1px solid var(--border); color: #fff;" onclick="location.reload()">LOGOUT</button>
                 </div>
             </div>
         </main>
+
         <div class="in-bar" id="chat-ui">
-            <input type="text" id="msg-input" placeholder=">_">
-            <button onclick="sendMessage()" style="background:var(--gold); border:none; padding:0 20px; border-radius:10px; font-weight:bold;">></button>
+            <input type="text" id="m-in" placeholder=">_">
+            <button onclick="send()" style="background:var(--gold); border:none; padding:0 20px; border-radius:10px; font-weight:bold; color:#000;">></button>
         </div>
+
         <footer>
-            <div id="n-chat" class="nav-i active" onclick="switchTab('chat')">CHAT</div>
+            <div id="n-chat" class="nav-i active" onclick="tab('chat')">CHAT</div>
             <div class="nav-i">MAPS</div>
             <div class="nav-i">HUB</div>
-            <div id="n-prof" class="nav-i" onclick="switchTab('prof')">PROFILE</div>
+            <div id="n-prof" class="nav-i" onclick="tab('prof')">PROFILE</div>
         </footer>
     </div>
 
     <script>
-        // СЛОВАРЬ (4 ЯЗЫКА)
-        const polyglot = {
-            'RU': { h: "РЕГИСТРАЦИЯ", b: "ИНИЦИАЛИЗАЦИЯ", g: "СИСТЕМА: ГОТОВА.", p: "ПРОФИЛЬ", f: "ИМЯ", l: "ФАМИЛИЯ", ph: "ТЕЛЕФОН" },
-            'EN': { h: "REGISTRATION", b: "INITIALIZE", g: "SYSTEM: READY.", p: "PROFILE", f: "NAME", l: "SURNAME", ph: "PHONE" },
-            'AR': { h: "تسجيل", b: "تهيئة", g: "النظام: جاهز", p: "الملف الشخصи", f: "اسم", l: "لقب", ph: "هاتف" },
-            'CH': { h: "注册", b: "初始化", g: "系统：就绪", p: "个人资料", f: "名字", l: "姓", ph: "电话" }
+        const langData = {
+            'RU': { h: "РЕГИСТРАЦИЯ", b: "ИНИЦИАЛИЗАЦИЯ", g: "СИСТЕМА: ГОТОВА.", p: "ПРОФИЛЬ", f: "ИМЯ", l: "ФАМИЛИЯ", ph: "ТЕЛЕФОН", ai: "АНАЛИЗ..." },
+            'EN': { h: "REGISTRATION", b: "INITIALIZE", g: "SYSTEM: READY.", p: "PROFILE", f: "NAME", l: "SURNAME", ph: "PHONE", ai: "ANALYZING..." },
+            'AR': { h: "تسجيل", b: "تهيئة", g: "النظام: جاهز", p: "الملف الشخصي", f: "اسم", l: "لقب", ph: "هاتف", ai: "جاري التحليل" },
+            'CH': { h: "注册", b: "初始化", g: "系统：就绪", p: "个人资料", f: "名字", l: "姓", ph: "电话", ai: "正在分析" }
         };
-        let activeLang = 'RU';
+        let cur = 'RU';
 
-        // ИСТОРИЯ
-        const chatNames = ["Alex", "Sarah", "Ahmed", "Li Wei", "Maria", "Ivan", "Fatima", "Chen", "John", "Elena"];
-        chatNames.forEach(n => document.getElementById('h-list').innerHTML += <div class="h-item" onclick="toggleSide()">Conversation with ${n}</div>);
+        const names = ["Alex", "Sarah", "Ahmed", "Li Wei", "Maria", "Ivan", "Fatima", "Chen", "John", "Elena"];
+        names.forEach(n => document.getElementById('h-list').innerHTML += <div class="h-item" onclick="menu()">Log_session_${n}</div>);
 
-        function setLang(l) {
-            activeLang = l;
+        function setL(l) {
+            cur = l;
             document.querySelectorAll('.l-btn').forEach(b => b.classList.remove('on'));
             document.getElementById('l-'+l).classList.add('on');
-            const d = polyglot[l];
+            const d = langData[l];
             document.getElementById('h-reg').innerText = d.h;
             document.getElementById('b-reg').innerText = d.b;
-            document.getElementById('ai-greet').innerText = d.g;
+            document.getElementById('ai-g').innerText = d.g;
             document.getElementById('n-prof').innerText = d.p;
-            document.getElementById('in-f').placeholder = d.f;
-            document.getElementById('in-l').placeholder = d.l;
-            document.getElementById('in-p').placeholder = d.ph;
+            document.getElementById('fn').placeholder = d.f;
+            document.getElementById('ln').placeholder = d.l;
+            document.getElementById('ph').placeholder = d.ph;
         }
 
-        function launchApp() {
-            const fname = document.getElementById('in-f').value;
-            if(!fname) return;
-            document.getElementById('u-display-name').innerText = fname + " " + document.getElementById('in-l').value;
+        function start() {
+            const name = document.getElementById('fn').value;
+            if(!name) return alert("Error: Name required");
+            document.getElementById('u-name').innerText = name + " " + document.getElementById('ln').value;
             document.getElementById('scr-reg').style.display = 'none';
             document.getElementById('app').style.display = 'flex';
         }
 
-        function toggleSide() {
+        function menu() {
             const s = document.getElementById('sidebar');
             s.classList.toggle('open');
             document.getElementById('over').style.display = s.classList.contains('open') ? 'block' : 'none';
         }
 
-        function switchTab(type) {
-            document.getElementById('view-chat').style.display = (type === 'chat' ? 'flex' : 'none');
-            document.getElementById('chat-ui').style.display = (type === 'chat' ? 'flex' : 'none');
-            document.getElementById('view-prof').style.display = (type === 'prof' ? 'block' : 'none');
-            document.getElementById('n-chat').classList.toggle('active', type === 'chat');
-            document.getElementById('n-prof').classList.toggle('active', type === 'prof');
+        function tab(t) {
+            document.getElementById('v-chat').style.display = (t === 'chat' ? 'flex' : 'none');
+            document.getElementById('chat-ui').style.display = (t === 'chat' ? 'flex' : 'none');
+            document.getElementById('v-prof').style.display = (t === 'prof' ? 'block' : 'none');
+            document.getElementById('n-chat').classList.toggle('active', t === 'chat');
+            document.getElementById('n-prof').classList.toggle('active', t === 'prof');
         }
 
-        function sendMessage() {
-            const input = document.getElementById('msg-input'); if(!input.value) return;
-            const chat = document.getElementById('view-chat');
-            chat.innerHTML += <div class="msg u">${input.value}</div>;
-            const val = input.value.toLowerCase(); input.value = '';
+        function send() {
+            const i = document.getElementById('m-in'); if(!i.value) return;
+            const v = document.getElementById('v-chat');
+            v.innerHTML += <div class="msg u">${i.value}</div>;
+            i.value = '';
             setTimeout(() => {
-                let ans = activeLang === 'RU' ? "Запрос обработан." : "Request processed.";
-                chat.innerHTML += <div class="msg ai">${ans}</div>;
-                document.getElementById('scroller').scrollTop = chat.scrollHeight;
+                v.innerHTML += <div class="msg ai">${langData[cur].ai}</div>;
+                document.getElementById('scroller').scrollTop = v.scrollHeight;
             }, 600);
         }
     </script>
