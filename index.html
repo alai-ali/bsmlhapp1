@@ -1,122 +1,184 @@
-[17:15, 03.03.2026] Ali: <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BSMLH | v19 NoSplash</title>
+    <title>BSMLH v12-REBORN</title>
     <style>
-        :root { --gold: #f6851b; --bg: #000; --panel: #0d0d0d; --border: #333; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: #000; color: #fff; height: 100vh; overflow: hidden; width: 100%; position: fixed; }
+        :root { --gold: #f6851b; --bg: #000; --panel: #111; --text: #fff; --border: #222; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
 
-        /* ЭКРАН РЕГИСТРАЦИИ (СРАЗУ) */
-        #scr-reg { position: fixed; inset: 0; background: #000; z-index: 2000; display: flex; flex-direction: column; align-items: center; padding: 20px; overflo…
-[17:18, 03.03.2026] Ali: <!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BSMLH v20</title>
-    <style>
-        body { background: #000; color: #fff; font-family: sans-serif; padding: 20px; }
-        
-        /* Стили кнопок и инпутов */
-        .box { border: 1px solid #333; padding: 15px; border-radius: 10px; margin-bottom: 20px; background: #0a0a0a; }
-        input { width: 100%; padding: 15px; margin: 10px 0; background: #111; border: 1px solid #444; color: #fff; border-radius: 8px; font-size: 16px; }
-        .btn { width: 100%; padding: 15px; background: #f6851b; border: none; color: #000; font-weight: bold; border-radius: 8px; cursor: pointer; text-transform: uppercase; }
-        
-        /* Языки */
-        .langs { display: flex; justify-content: space-between; margin-bottom: 20px; }
-        .l-btn { padding: 10px; border: 1px solid #444; border-radius: 5px; font-size: 12px; color: #888; }
-        .l-btn.on { border-color: #f6851b; color: #f6851b; }
+        /* СПЛЭШ (3 СЕКУНДЫ) - ЧИСТО БЕЛЫЙ ТЕКСТ */
+        #splash {
+            position: fixed; inset: 0; z-index: 9999; background: #000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .s-title { font-size: 48px; font-weight: 900; letter-spacing: 12px; color: #fff; }
+        .s-sub { font-size: 11px; color: #fff; margin-top: 15px; text-align: center; max-width: 80%; line-height: 1.4; }
 
-        /* История (Sidebar упрощенный) */
-        .history { display: none; margin-top: 20px; border-top: 1px solid #333; padding-top: 10px; }
-        .h-item { padding: 10px; color: #666; border-bottom: 1px solid #111; }
+        /* ЭКРАНЫ */
+        .screen { position: fixed; inset: 0; display: none; flex-direction: column; align-items: center; padding: 25px; background: #000; z-index: 1000; }
+        .active { display: flex; }
 
-        /* Контент приложения */
-        #app-content { display: none; }
+        /* ЯЗЫКИ - 4 КНОПКИ */
+        .lang-bar { display: flex; gap: 10px; margin-bottom: 20px; }
+        .l-btn { border: 1px solid var(--border); padding: 8px 12px; font-size: 12px; cursor: pointer; color: #555; border-radius: 4px; }
+        .l-btn.on { color: var(--gold); border-color: var(--gold); }
+
+        /* ФОРМА */
+        .f-box { width: 100%; max-width: 350px; display: flex; flex-direction: column; gap: 12px; }
+        input { background: #0a0a0a; border: 1px solid var(--border); padding: 18px; color: #fff; border-radius: 10px; font-size: 16px; outline: none; }
+        .btn-m { background: var(--gold); color: #000; border: none; padding: 20px; border-radius: 10px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
+
+        /* БОКОВОЕ МЕНЮ С ИСТОРИЕЙ */
+        #sidebar { position: fixed; left: -280px; top: 0; bottom: 0; width: 280px; background: #0a0a0a; z-index: 6000; transition: 0.3s; border-right: 1px solid var(--border); padding: 20px; }
+        #sidebar.open { left: 0; }
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 5500; display: none; }
+        .h-item { padding: 12px; border-bottom: 1px solid #1a1a1a; font-size: 14px; color: #777; }
+
+        /* ОСНОВНОЙ ИНТЕРФЕЙС */
+        #main-app { display: none; height: 100vh; flex-direction: column; }
+        header { height: 65px; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; border-bottom: 1px solid var(--border); }
+        .content { flex: 1; overflow-y: auto; padding: 20px; }
+
+        /* ЧАТ */
+        .msg { padding: 12px; border-radius: 10px; font-size: 14px; max-width: 85%; margin-bottom: 10px; }
+        .msg.ai { background: #111; border-left: 3px solid var(--gold); }
+        .msg.u { background: var(--gold); color: #000; align-self: flex-end; margin-left: auto; font-weight: bold; }
+
+        /* ФУТЕР - 4 КНОПКИ */
+        footer { height: 90px; padding-bottom: 25px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--border); background: #050505; }
+        .nav-btn { color: #444; font-size: 10px; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .nav-btn.on { color: var(--gold); }
+
+        .input-ui { padding: 15px; display: flex; gap: 10px; border-top: 1px solid var(--border); }
     </style>
 </head>
 <body>
 
-    <div id="reg-screen">
-        <div class="langs">
-            <div class="l-btn on" onclick="setL('RU')">RU</div>
-            <div class="l-btn" onclick="setL('EN')">EN</div>
-            <div class="l-btn" onclick="setL('AR')">AR</div>
-            <div class="l-btn" onclick="setL('CH')">CH</div>
+    <div id="splash">
+        <div class="s-title">BSMLH</div>
+        <div class="s-sub">BIOMETRIC SECURITY MULTI-FUNCTION LEDGER FOR HUMANITY</div>
+    </div>
+
+    <div id="scr-reg" class="screen">
+        <div class="lang-bar">
+            <div id="l-RU" class="l-btn on" onclick="setL('RU')">RU</div>
+            <div id="l-EN" class="l-btn" onclick="setL('EN')">EN</div>
+            <div id="l-AR" class="l-btn" onclick="setL('AR')">AR</div>
+            <div id="l-CH" class="l-btn" onclick="setL('CH')">CH</div>
         </div>
-        
-        <div class="box">
-            <h2 id="h-title">РЕГИСТРАЦИЯ</h2>
-            <input type="text" id="fname" placeholder="ИМЯ">
-            <input type="text" id="lname" placeholder="ФАМИЛИЯ">
-            <input type="tel" id="phone" placeholder="ТЕЛЕФОН">
-            <button class="btn" id="h-btn" onclick="openApp()">ВОЙТИ</button>
+        <h2 id="h-reg" style="margin-bottom: 20px;">РЕГИСТРАЦИЯ</h2>
+        <div class="f-box">
+            <input type="text" id="fn" placeholder="ИМЯ">
+            <input type="text" id="ln" placeholder="ФАМИЛИЯ">
+            <input type="tel" id="ph" placeholder="ТЕЛЕФОН">
+            <button class="btn-m" id="b-reg" onclick="toApp()">ИНИЦИАЛИЗАЦИЯ</button>
         </div>
     </div>
 
-    <div id="app-content">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <div onclick="toggleHist()" style="color: #f6851b; font-size: 24px;">☰</div>
-            <div style="letter-spacing: 3px; font-weight: bold;">BSMLH</div>
-            <div onclick="location.reload()">Выход</div>
-        </div>
+    <div id="sidebar">
+        <h3 style="color:var(--gold); margin-bottom:15px;">HISTORY</h3>
+        <div id="h-list"></div>
+    </div>
+    <div class="overlay" id="over" onclick="side()"></div>
 
-        <div id="history-box" class="history">
-            <div class="h-item">История: Alex</div>
-            <div class="h-item">История: Maria</div>
-            <div class="h-item">История: Ahmed</div>
-            <div class="h-item">История: Li Wei</div>
-        </div>
+    <div id="main-app">
+        <header>
+            <div onclick="side()" style="font-size:24px; color:var(--gold);">☰</div>
+            <div style="font-weight:900; letter-spacing:4px;">BSMLH</div>
+            <div style="color:#222;">⋮</div>
+        </header>
 
-        <div class="box" id="chat-box">
-            <div id="messages" style="min-height: 100px; font-size: 14px; color: #ccc;">
-                СИСТЕМА: ОНЛАЙН.
+        <div class="content" id="scroller">
+            <div id="v-chat" style="display: flex; flex-direction: column;">
+                <div class="msg ai" id="ai-g">СИСТЕМА: ОНЛАЙН.</div>
+            </div>
+            <div id="v-prof" style="display:none; text-align:center;">
+                <div style="background:#0a0a0a; padding:25px; border-radius:15px; border:1px solid var(--border);">
+                    <div style="font-size:40px; margin-bottom:10px;">👤</div>
+                    <h3 id="u-name">USER</h3>
+                    <p style="color:var(--gold); font-size:11px; margin-top:5px;">STATUS: vHUID-ENCRYPTED</p>
+                    <button class="btn-m" style="width:100%; margin-top:20px;" onclick="location.reload()">LOGOUT</button>
+                </div>
             </div>
         </div>
 
-        <input type="text" id="user-msg" placeholder="Сообщение...">
-        <button class="btn" onclick="sendMsg()">ОТПРАВИТЬ</button>
+        <div class="input-ui" id="chat-ui">
+            <input type="text" id="m-in" placeholder=">_" style="flex:1;">
+            <button onclick="send()" style="background:var(--gold); border:none; padding:0 15px; border-radius:8px; font-weight:bold;">></button>
+        </div>
+
+        <footer>
+            <div id="n-chat" class="nav-btn on" onclick="tab('chat')">CHAT</div>
+            <div class="nav-btn">MAPS</div>
+            <div class="nav-btn">HUB</div>
+            <div id="n-prof" class="nav-btn" onclick="tab('prof')">PROFILE</div>
+        </footer>
     </div>
 
     <script>
-        const texts = {
-            'RU': { h: "РЕГИСТРАЦИЯ", b: "ВОЙТИ" },
-            'EN': { h: "REGISTRATION", b: "LOGIN" },
-            'AR': { h: "تسجيل", b: "دخول" },
-            'CH': { h: "注册", b: "登录" }
+        // СПЛЭШ ГАРАНТИРОВАННО СЧЕЗАЕТ (v12 STYLE)
+        setTimeout(() => {
+            document.getElementById('splash').style.display = 'none';
+            document.getElementById('scr-reg').classList.add('active');
+        }, 3000);
+
+        const voc = {
+            'RU': { h: "РЕГИСТРАЦИЯ", b: "ИНИЦИАЛИЗАЦИЯ", g: "СИСТЕМА: ГОТОВА.", p: "ПРОФИЛЬ", f: "ИМЯ", l: "ФАМИЛИЯ", ph: "ТЕЛЕФОН" },
+            'EN': { h: "REGISTRATION", b: "INITIALIZE", g: "SYSTEM: READY.", p: "PROFILE", f: "NAME", l: "SURNAME", ph: "PHONE" },
+            'AR': { h: "تسجيل", b: "تهيئة", g: "النظام: جاهز", p: "الملف الشخصي", f: "اسم", l: "لقб", ph: "هاتف" },
+            'CH': { h: "注册", b: "初始化", g: "系统：就绪", p: "个人资料", f: "名字", l: "姓", ph: "电话" }
         };
+        let curL = 'RU';
+
+        // 10 ИМЕН В ИСТОРИИ
+        const names = ["Alex", "Sarah", "Ahmed", "Li Wei", "Maria", "Ivan", "Fatima", "Chen", "John", "Elena"];
+        names.forEach(n => document.getElementById('h-list').innerHTML += <div class="h-item">Log_${n}</div>);
 
         function setL(l) {
+            curL = l;
             document.querySelectorAll('.l-btn').forEach(b => b.classList.remove('on'));
-            event.target.classList.add('on');
-            document.getElementById('h-title').innerText = texts[l].h;
-            document.getElementById('h-btn').innerText = texts[l].b;
+            document.getElementById('l-'+l).classList.add('on');
+            document.getElementById('h-reg').innerText = voc[l].h;
+            document.getElementById('b-reg').innerText = voc[l].b;
+            document.getElementById('ai-g').innerText = voc[l].g;
+            document.getElementById('n-prof').innerText = voc[l].p;
+            document.getElementById('fn').placeholder = voc[l].f;
+            document.getElementById('ln').placeholder = voc[l].l;
+            document.getElementById('ph').placeholder = voc[l].ph;
         }
 
-        function openApp() {
-            const name = document.getElementById('fname').value;
-            if(!name) return alert("Введите имя");
-            document.getElementById('reg-screen').style.display = 'none';
-            document.getElementById('app-content').style.display = 'block';
+        function toApp() {
+            document.getElementById('u-name').innerText = document.getElementById('fn').value + " " + document.getElementById('ln').value;
+            document.getElementById('scr-reg').style.display = 'none';
+            document.getElementById('main-app').style.display = 'flex';
         }
 
-        function toggleHist() {
-            const h = document.getElementById('history-box');
-            h.style.display = (h.style.display === 'block' ? 'none' : 'block');
+        function side() {
+            const s = document.getElementById('sidebar');
+            s.classList.toggle('open');
+            document.getElementById('over').style.display = s.classList.contains('open') ? 'block' : 'none';
         }
 
-        function sendMsg() {
-            const m = document.getElementById('user-msg');
-            if(!m.value) return;
-            const box = document.getElementById('messages');
-            box.innerHTML += <div style="color:#f6851b; margin-top:10px;">Вы: ${m.value}</div>;
-            m.value = '';
+        function tab(t) {
+            document.getElementById('v-chat').style.display = (t === 'chat' ? 'flex' : 'none');
+            document.getElementById('chat-ui').style.display = (t === 'chat' ? 'flex' : 'none');
+            document.getElementById('v-prof').style.display = (t === 'prof' ? 'block' : 'none');
+            document.getElementById('n-chat').classList.toggle('on', t === 'chat');
+            document.getElementById('n-prof').classList.toggle('on', t === 'prof');
+        }
+
+        function send() {
+            const i = document.getElementById('m-in'); if(!i.value) return;
+            const v = document.getElementById('v-chat');
+            v.innerHTML += <div class="msg u">${i.value}</div>;
+            i.value = '';
             setTimeout(() => {
-                box.innerHTML += <div style="color:#888; margin-top:5px;">ИИ: Анализ завершен.</div>;
-            }, 500);
+                v.innerHTML += <div class="msg ai">ANALYSIS COMPLETE. STATUS: OK.</div>;
+                document.getElementById('scroller').scrollTop = v.scrollHeight;
+            }, 600);
         }
     </script>
 </body>
