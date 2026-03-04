@@ -3,138 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BSMLH v6.5 | Advanced Tech</title>
+    <title>BSMLH v6.6 | Maps Integrated</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        :root { --gold: #f6851b; --bg: #000; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: #000; color: #fff; height: 100vh; overflow: hidden; position: fixed; width: 100%; }
+        :root { --gold: #f6851b; --bg: #000; --panel: #111; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
+        body { background: #000; color: #fff; height: 100vh; overflow: hidden; }
 
-        /* ЗАСТАВКА */
-        #splash { position: fixed; inset: 0; z-index: 9999; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; animation: fadeOut 0.5s forwards 3s; pointer-events: none; }
-        @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
-        .s-title { font-size: 50px; font-weight: 900; letter-spacing: 12px; color: #fff; }
-        .s-sub { font-size: 10px; color: #fff; margin-top: 15px; text-align: center; max-width: 80%; text-transform: uppercase; }
-
-        /* ЭКРАНЫ */
-        .screen { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; padding: 25px; background: #000; z-index: 1000; }
+        /* ЭКРАНЫ (Упростим переход для теста) */
+        .screen { position: absolute; inset: 0; display: none; flex-direction: column; background: #000; z-index: 1000; }
         .active { display: flex; }
 
-        /* КАМЕРА */
-        #video-feed { width: 240px; height: 300px; background: #111; border: 2px solid var(--gold); border-radius: 20px; object-fit: cover; transform: scaleX(-1); }
-        .cam-box { position: relative; margin-bottom: 20px; }
-        .scan-line { position: absolute; width: 100%; height: 2px; background: var(--gold); top: 0; animation: scan 2s infinite; z-index: 2; }
-        @keyframes scan { 0% { top: 0; } 50% { top: 100%; } 100% { top: 0; } }
+        /* APP STRUCTURE */
+        #app { display: none; height: 100vh; flex-direction: column; z-index: 2000; }
+        header { height: 60px; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; border-bottom: 1px solid #222; background: #050505; }
+        .main-content { flex: 1; position: relative; overflow: hidden; }
+        
+        /* КАРТА */
+        #map { width: 100%; height: 100%; background: #050505; display: none; }
+        .map-overlay { position: absolute; bottom: 20px; left: 20px; z-index: 1000; }
+        .map-btn { background: var(--gold); border: none; padding: 12px; border-radius: 8px; font-weight: bold; color: #000; cursor: pointer; font-size: 12px; }
 
-        /* КНОПКИ */
-        .f-box { width: 100%; max-width: 320px; display: flex; flex-direction: column; gap: 10px; }
-        input { background: #111; border: 1px solid #333; padding: 16px; color: #fff; border-radius: 12px; font-size: 16px; outline: none; }
-        .btn-m { background: var(--gold); color: #000; border: none; padding: 20px; border-radius: 12px; font-weight: bold; text-transform: uppercase; cursor: pointer; }
-        .btn-link { color: #555; font-size: 11px; margin-top: 20px; text-decoration: underline; cursor: pointer; }
+        /* ЧАТ / ПРОФИЛЬ */
+        .view { width: 100%; height: 100%; padding: 20px; overflow-y: auto; display: none; }
+        .active-view { display: block; }
 
-        #app { display: none; height: 100vh; flex-direction: column; background: #000; z-index: 5000; position: absolute; inset: 0; }
+        /* ФУТЕР */
+        footer { height: 90px; padding-bottom: 30px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #222; background: #050505; }
+        .n-btn { color: #444; font-size: 10px; font-weight: bold; text-transform: uppercase; text-align: center; }
+        .n-btn.on { color: var(--gold); }
+
+        /* РЕГИСТРАЦИЯ (для быстрого входа в тест) */
+        .btn-m { background: var(--gold); color: #000; border: none; padding: 20px; border-radius: 12px; font-weight: bold; width: 100%; max-width: 300px; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div id="splash">
-        <div class="s-title">BSMLH</div>
-        <div class="s-sub">BIOMETRIC SECURITY MULTIFUNCTION LEDGER FOR HUMANITY</div>
-    </div>
-
-    <div id="scr-reg" class="screen active">
-        <h2 style="margin-top: 40px; margin-bottom: 20px;">РЕГИСТРАЦИЯ</h2>
-        <div class="f-box">
-            <input type="text" id="in-f" placeholder="ИМЯ">
-            <button class="btn-m" onclick="startCam()">ДАЛЕЕ</button>
-        </div>
-    </div>
-
-    <div id="scr-scan" class="screen">
-        <div class="cam-box">
-            <video id="video-feed" autoplay playsinline></video>
-            <div class="scan-line"></div>
-        </div>
-        <div class="f-box">
-            <button class="btn-m" onclick="takePhoto()">СДЕЛАТЬ ФОТО</button>
-        </div>
-    </div>
-
-    <div id="scr-chip" class="screen">
-        <div style="font-size: 60px; margin-bottom: 20px;">🛡️</div>
-        <h3 id="nfc-status">ОЖИДАНИЕ ЧИПА...</h3>
-        <p style="font-size: 12px; color: #666; text-align: center; margin: 15px 0;">ПРИЛОЖИТЕ NFC ЧИП К ЗАДНЕЙ ПАНЕЛИ</p>
-        <div class="f-box">
-            <button class="btn-m" onclick="startNFC()">АКТИВИРОВАТЬ СКАНЕР</button>
-            <div class="btn-link" onclick="toApp()">ВОЙТИ БЕЗ ЧИПА</div>
-        </div>
+    <div id="scr-reg" class="screen active" style="justify-content: center; align-items: center;">
+        <h2 style="margin-bottom: 20px; letter-spacing: 5px;">BSMLH LOGIN</h2>
+        <input type="text" id="user-name" placeholder="ВВЕДИТЕ ИМЯ" style="background:#111; border:1px solid #333; color:#fff; padding:15px; border-radius:10px; margin-bottom:15px; width:280px;">
+        <button class="btn-m" onclick="login()">ИНИЦИАЛИЗАЦИЯ</button>
     </div>
 
     <div id="app">
-        <header style="height:70px; border-bottom:1px solid #222; display:flex; justify-content:center; align-items:center;">
-            <div style="font-weight:900; letter-spacing:4px;">BSMLH</div>
+        <header>
+            <div style="font-size:20px; color:var(--gold);">☰</div>
+            <div style="font-weight:900; letter-spacing:3px; font-size:14px;">BSMLH vHUID</div>
+            <div id="top-user" style="font-size:10px; color:#666;">USER</div>
         </header>
-        <div style="padding:20px;">
-            <div style="background:#111; padding:15px; border-radius:12px; border-left:4px solid var(--gold);">
-                ДОСТУП РАЗРЕШЕН.
+
+        <div class="main-content">
+            <div id="map"></div>
+            <div class="map-overlay" id="map-ui" style="display:none;">
+                <button class="map-btn" onclick="getMyLoc()">МОЯ ПОЗИЦИЯ</button>
+            </div>
+
+            <div id="view-chat" class="view active-view">
+                <div style="background:#111; padding:15px; border-radius:12px; border-left:4px solid var(--gold);">
+                    СИСТЕМА: ОЖИДАНИЕ КОМАНДЫ...
+                </div>
+            </div>
+
+            <div id="view-prof" class="view">
+                <div style="text-align:center; padding-top:40px;">
+                    <div style="font-size:60px; margin-bottom:10px;">👤</div>
+                    <h2 id="prof-name">USER NAME</h2>
+                    <p style="color:var(--gold); font-size:12px; margin-top:5px;">ID: 778-BSMLH-01</p>
+                </div>
             </div>
         </div>
+
+        <footer>
+            <div id="n-chat" class="n-btn on" onclick="showTab('chat')">CHAT</div>
+            <div id="n-maps" class="n-btn" onclick="showTab('maps')">MAPS</div>
+            <div class="n-btn">HUB</div>
+            <div id="n-prof" class="n-btn" onclick="showTab('prof')">PROFILE</div>
+        </footer>
     </div>
 
     <script>
-        // 1. Работа с камерой
-        async function startCam() {
-            if(!document.getElementById('in-f').value) return;
-            document.getElementById('scr-reg').classList.remove('active');
-            document.getElementById('scr-scan').classList.add('active');
-            
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
-                document.getElementById('video-feed').srcObject = stream;
-            } catch (err) {
-                alert("Камера недоступна");
-                toChipScreen();
-            }
-        }
+        let map;
+        let userMarker;
 
-        function takePhoto() {
-            const video = document.getElementById('video-feed');
-            video.pause(); // Эффект снимка
-            setTimeout(() => {
-                const stream = video.srcObject;
-                stream.getTracks().forEach(track => track.stop()); // Выключаем камеру
-                toChipScreen();
-            }, 1000);
-        }
-
-        function toChipScreen() {
-            document.getElementById('scr-scan').classList.remove('active');
-            document.getElementById('scr-chip').classList.add('active');
-        }
-
-        // 2. Реальный NFC (работает в Chrome на Android)
-        async function startNFC() {
-            if ('NDEFReader' in window) {
-                try {
-                    const ndef = new NDEFReader();
-                    await ndef.scan();
-                    document.getElementById('nfc-status').innerText = "ПОИСК ЧИПА...";
-                    
-                    ndef.onreading = event => {
-                        document.getElementById('nfc-status').innerText = "ЧИП ПОДТВЕРЖДЕН!";
-                        document.getElementById('nfc-status').style.color = "#f6851b";
-                        setTimeout(toApp, 1000);
-                    };
-                } catch (error) {
-                    alert("Ошибка NFC: " + error);
-                }
-            } else {
-                alert("Ваш браузер не поддерживает NFC. Используйте вход без чипа.");
-            }
-        }
-
-        function toApp() {
-            document.getElementById('scr-chip').classList.remove('active');
+        function login() {
+            const name = document.getElementById('user-name').value;
+            if(!name) return;
+            document.getElementById('top-user').innerText = name.toUpperCase();
+            document.getElementById('prof-name').innerText = name;
+            document.getElementById('scr-reg').style.display = 'none';
             document.getElementById('app').style.display = 'flex';
+            initMap(); // Инициализируем карту заранее, но она скрыта
+        }
+
+        function initMap() {
+            // Создаем карту, центрируем на мир. Темная тема через CartoDB.
+            map = L.map('map', { zoomControl: false }).setView([50, 20], 3);
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: 'BSMLH SECURITY'
+            }).addTo(map);
+        }
+
+        function showTab(tab) {
+            // Скрываем всё
+            document.getElementById('view-chat').style.display = 'none';
+            document.getElementById('view-prof').style.display = 'none';
+            document.getElementById('map').style.display = 'none';
+            document.getElementById('map-ui').style.display = 'none';
+            
+            // Снимаем подсветку с кнопок
+            document.querySelectorAll('.n-btn').forEach(b => b.classList.remove('on'));
+
+            if(tab === 'chat') {
+                document.getElementById('view-chat').style.display = 'block';
+                document.getElementById('n-chat').classList.add('on');
+            } 
+            else if(tab === 'maps') {
+                document.getElementById('map').style.display = 'block';
+                document.getElementById('map-ui').style.display = 'block';
+                document.getElementById('n-maps').classList.add('on');
+                // Обновляем размер карты (важно для Leaflet при смене дисплея)
+                setTimeout(() => map.invalidateSize(), 100);
+            }
+            else if(tab === 'prof') {
+                document.getElementById('view-prof').style.display = 'block';
+                document.getElementById('n-prof').classList.add('on');
+            }
+        }
+
+        function getMyLoc() {
+            if (!navigator.geolocation) return alert("GPS не поддерживается");
+            
+            navigator.geolocation.getCurrentPosition((pos) => {
+                const { latitude, longitude } = pos.coords;
+                map.setView([latitude, longitude], 13);
+                
+                if (userMarker) map.removeLayer(userMarker);
+                userMarker = L.circle([latitude, longitude], {
+                    color: '#f6851b',
+                    fillColor: '#f6851b',
+                    fillOpacity: 0.5,
+                    radius: 500
+                }).addTo(map).bindPopup('ВАША ПОЗИЦИЯ: АКТИВНА').openPopup();
+            });
         }
     </script>
 </body>
