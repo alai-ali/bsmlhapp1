@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BSMLH v6.8 Fixed</title>
+    <title>BSMLH v6.9 | Stable Foundation</title>
     <style>
         :root { --gold: #f6851b; --bg: #000; --wc-bg: #ededed; --blue: #007aff; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background: #000; color: #fff; height: 100vh; overflow: hidden; position: fixed; width: 100%; }
 
-        /* ЗАСТАВКА */
+        /* ЗАСТАВКА (СТРОГО ПО ПЛАНУ) */
         #splash { position: fixed; inset: 0; z-index: 9999; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; animation: fadeOut 0.5s forwards 2.5s; pointer-events: none; }
         @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
         .s-title { font-size: 50px; font-weight: 900; letter-spacing: 12px; color: #fff; }
+        .s-sub { font-size: 10px; color: #fff; margin-top: 15px; text-align: center; max-width: 80%; text-transform: uppercase; }
 
         /* ЭКРАНЫ */
         .screen { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; padding: 25px; background: #000; z-index: 1000; }
@@ -20,7 +21,7 @@
 
         /* ГЛОБУС */
         .globe-wrap { position: absolute; top: 20px; right: 20px; z-index: 2000; }
-        .globe-btn { font-size: 30px; cursor: pointer; }
+        .globe-btn { font-size: 30px; cursor: pointer; color: var(--blue); }
         .lang-menu { position: absolute; top: 40px; right: 0; background: #1a1a1a; border: 1px solid #333; border-radius: 12px; display: none; flex-direction: column; width: 120px; overflow: hidden; }
         .lang-menu div { padding: 12px; text-align: center; font-size: 14px; border-bottom: 1px solid #333; cursor: pointer; color: #fff; }
 
@@ -28,8 +29,8 @@
         #video-feed { width: 260px; height: 260px; background: #111; border: 3px solid var(--gold); border-radius: 50%; object-fit: cover; transform: scaleX(-1); }
 
         /* ЭКРАН ЧИПА */
-        .ring-frame { width: 260px; height: 260px; margin: 20px 0; border-radius: 20px; overflow: hidden; border: 1px solid #222; }
-        .ring-frame img { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; }
+        .ring-frame { width: 260px; height: 260px; margin: 20px 0; border-radius: 20px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+        .ring-frame img { max-width: 100%; max-height: 100%; object-fit: contain; }
         
         /* APP UI */
         #app { display: none; height: 100vh; flex-direction: column; background: var(--wc-bg); z-index: 5000; position: absolute; inset: 0; color: #000; }
@@ -52,7 +53,10 @@
 </head>
 <body>
 
-    <div id="splash"><div class="s-title">BSMLH</div></div>
+    <div id="splash">
+        <div class="s-title">BSMLH</div>
+        <div class="s-sub">BIOMETRIC SECURITY MULTIFUNCTION LEDGER FOR HUMANITY</div>
+    </div>
 
     <div id="scr-reg" class="screen active">
         <div class="globe-wrap">
@@ -78,7 +82,8 @@
     <div id="scr-chip" class="screen">
         <h3 id="chip-t">ОЖИДАНИЕ ЧИПА...</h3>
         <div class="ring-frame">
-            <img src="https://i.imgur.com/8vW5mXw.png" alt="Ring" loading="lazy">
+            <img src="ring.png" alt="RING" onerror="this.style.display='none'">
+            <div id="ring-placeholder" style="font-size:80px;">💍</div>
         </div>
         <button id="chip-b" class="btn-m" onclick="toApp()">ПОДТВЕРДИТЬ</button>
         <div class="btn-link" onclick="toApp()">ВОЙТИ БЕЗ ЧИПА</div>
@@ -89,7 +94,7 @@
         <div class="content">
             <div id="view-chat"></div>
             <div id="view-maps" style="display:none; height:100%;">
-                <iframe src="about:blank" id="map-frame" style="width:100%; height:100%; border:0;"></iframe>
+                <iframe id="map-frame" style="width:100%; height:100%; border:0;"></iframe>
             </div>
             <div id="view-prof" style="display:none;">
                 <div class="wc-header">
@@ -137,8 +142,10 @@
             if(!document.getElementById('in-f').value) return;
             document.getElementById('scr-reg').classList.remove('active');
             document.getElementById('scr-scan').classList.add('active');
-            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
-            document.getElementById('video-feed').srcObject = stream;
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+                document.getElementById('video-feed').srcObject = stream;
+            } catch(e) { alert("Ошибка камеры"); toApp(); }
         }
 
         function takePhoto() {
@@ -148,7 +155,7 @@
             canvas.height = video.videoHeight;
             canvas.getContext('2d').drawImage(video, 0, 0);
             document.getElementById('user-photo').src = canvas.toDataURL('image/png');
-            video.srcObject.getTracks().forEach(t => t.stop());
+            if(video.srcObject) video.srcObject.getTracks().forEach(t => t.stop());
             document.getElementById('scr-scan').classList.remove('active');
             document.getElementById('scr-chip').classList.add('active');
         }
@@ -163,7 +170,7 @@
         function loadChats() {
             const list = document.getElementById('view-chat');
             const names = ["Alex", "Sarah", "Ahmed", "Li Wei", "Maria", "Ivan", "Fatima", "Chen", "John", "Elena"];
-            list.innerHTML = names.map(n => <div class="chat-item"><div class="chat-av">👤</div><div class="chat-info"><h4>${n}</h4><p>Secure connection...</p></div></div>).join('');
+            list.innerHTML = names.map(n => <div class="chat-item"><div class="chat-av">👤</div><div class="chat-info"><h4>${n}</h4><p>Secure message...</p></div></div>).join('');
         }
 
         function tab(t) {
@@ -172,7 +179,7 @@
             document.getElementById('view-prof').style.display = (t === 'prof' ? 'block' : 'none');
             document.querySelectorAll('.n-btn').forEach(b => b.classList.remove('on'));
             document.getElementById('n-' + t).classList.add('on');
-            if(t === 'maps') document.getElementById('map-frame').src = "https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d1000!2d0!3d0!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2s!4v1";
+            if(t === 'maps') document.getElementById('map-frame').src = "https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d1!2d0!3d0!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e1!3m2!1sru!2skz!4v1";
         }
     </script>
 </body>
