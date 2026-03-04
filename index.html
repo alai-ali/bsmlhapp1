@@ -3,112 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BSMLH v6.6 | WeChat Style & Maps</title>
+    <title>BSMLH v6.8 | Ring Auth</title>
     <style>
-        :root { --gold: #f6851b; --bg: #000; --wc-bg: #ededed; }
+        :root { --gold: #f6851b; --bg: #000; --wc-bg: #ededed; --blue: #007aff; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background: #000; color: #fff; height: 100vh; overflow: hidden; position: fixed; width: 100%; }
 
-        /* ЗАСТАВКА (v6.5) */
-        #splash { position: fixed; inset: 0; z-index: 9999; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; animation: fadeOut 0.5s forwards 3s; pointer-events: none; }
+        /* ЗАСТАВКА */
+        #splash { position: fixed; inset: 0; z-index: 9999; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; animation: fadeOut 0.5s forwards 2.5s; pointer-events: none; }
         @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
         .s-title { font-size: 50px; font-weight: 900; letter-spacing: 12px; color: #fff; }
-        .s-sub { font-size: 10px; color: #fff; margin-top: 15px; text-align: center; max-width: 80%; text-transform: uppercase; }
 
         /* ЭКРАНЫ */
         .screen { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; padding: 25px; background: #000; z-index: 1000; }
         .active { display: flex; }
 
-        /* КАМЕРА & NFC (v6.5) */
-        #video-feed { width: 240px; height: 300px; background: #111; border: 2px solid var(--gold); border-radius: 20px; object-fit: cover; transform: scaleX(-1); }
-        .scan-line { position: absolute; width: 100%; height: 2px; background: var(--gold); top: 0; animation: scan 2s infinite; }
-        @keyframes scan { 0% { top: 0; } 50% { top: 100%; } 100% { top: 0; } }
+        /* ГЛОБУС */
+        .globe-wrap { position: absolute; top: 20px; right: 20px; z-index: 2000; }
+        .globe-btn { font-size: 30px; cursor: pointer; filter: drop-shadow(0 0 5px var(--blue)); }
+        .lang-menu { position: absolute; top: 40px; right: 0; background: #1a1a1a; border: 1px solid #333; border-radius: 12px; display: none; flex-direction: column; width: 120px; overflow: hidden; }
+        .lang-menu div { padding: 12px; text-align: center; font-size: 14px; border-bottom: 1px solid #333; cursor: pointer; color: #fff; }
 
-        /* КНОПКИ */
-        .btn-m { background: var(--gold); color: #000; border: none; padding: 20px; border-radius: 12px; font-weight: bold; text-transform: uppercase; cursor: pointer; width: 100%; max-width: 320px; }
+        /* КАМЕРА */
+        #video-feed { width: 260px; height: 260px; background: #111; border: 3px solid var(--gold); border-radius: 50%; object-fit: cover; transform: scaleX(-1); }
 
-        /* ПРИЛОЖЕНИЕ */
+        /* ЭКРАН ЧИПА С ТВОИМ КОЛЬЦОМ */
+        .ring-frame { width: 280px; height: 280px; margin: 20px 0; border-radius: 20px; overflow: hidden; border: 1px solid #333; position: relative; }
+        .ring-frame img { width: 100%; height: 100%; object-fit: cover; animation: ringPulse 3s infinite ease-in-out; }
+        @keyframes ringPulse { 0% { opacity: 0.7; transform: scale(1); } 50% { opacity: 1; transform: scale(1.03); } 100% { opacity: 0.7; transform: scale(1); } }
+
+        /* APP STRUCTURE */
         #app { display: none; height: 100vh; flex-direction: column; background: var(--wc-bg); z-index: 5000; position: absolute; inset: 0; color: #000; }
-        header { height: 60px; background: #000; color: #fff; display: flex; justify-content: center; align-items: center; font-weight: 900; letter-spacing: 4px; }
-        .content { flex: 1; overflow-y: auto; position: relative; }
+        header { height: 60px; background: #1a1a1a; color: #fff; display: flex; justify-content: center; align-items: center; font-weight: 600; }
+        
+        /* КОНТАКТЫ */
+        .chat-list { background: #fff; }
+        .chat-item { display: flex; padding: 12px 15px; border-bottom: 1px solid #f2f2f2; align-items: center; }
+        .chat-av { width: 48px; height: 48px; background: #eee; border-radius: 6px; margin-right: 12px; font-size: 24px; display: flex; align-items: center; justify-content: center; }
 
-        /* КАРТА GOOGLE */
-        #view-maps { width: 100%; height: 100%; display: none; }
-        iframe { border: 0; width: 100%; height: 100%; }
-
-        /* ПРОФИЛЬ WECHAT STYLE */
-        #view-prof { display: none; background: var(--wc-bg); height: 100%; }
-        .wc-header { background: #fff; padding: 40px 20px 20px; display: flex; align-items: center; margin-bottom: 10px; }
-        .wc-av { width: 64px; height: 64px; background: #ddd; border-radius: 8px; margin-right: 15px; font-size: 40px; display: flex; align-items: center; justify-content: center; }
-        .wc-name h2 { font-size: 20px; font-weight: 600; }
-        .wc-name p { color: #888; font-size: 14px; margin-top: 4px; }
-        .wc-list { background: #fff; margin-bottom: 10px; }
-        .wc-item { padding: 15px 20px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-        .wc-item:active { background: #f5f5f5; }
-        .wc-item span { font-size: 16px; }
-        .wc-arrow { color: #ccc; font-weight: bold; }
+        /* ПРОФИЛЬ */
+        .wc-header { background: #fff; padding: 30px 20px; display: flex; align-items: center; margin-bottom: 10px; }
+        #user-photo { width: 64px; height: 64px; border-radius: 8px; margin-right: 15px; background: #eee; object-fit: cover; }
 
         footer { height: 85px; padding-bottom: 25px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #ddd; background: #f7f7f7; }
-        .n-btn { color: #999; font-size: 10px; font-weight: bold; text-transform: uppercase; text-align: center; cursor: pointer; }
-        .n-btn.on { color: #07c160; } /* Цвет WeChat */
+        .n-btn { color: #999; font-size: 10px; font-weight: bold; text-transform: uppercase; text-align: center; }
+        .n-btn.on { color: #07c160; }
+        
+        .btn-m { background: var(--gold); color: #000; border: none; padding: 18px; border-radius: 12px; font-weight: bold; width: 100%; max-width: 300px; }
     </style>
 </head>
 <body>
 
-    <div id="splash">
-        <div class="s-title">BSMLH</div>
-        <div class="s-sub">BIOMETRIC SECURITY MULTIFUNCTION LEDGER FOR HUMANITY</div>
-    </div>
+    <div id="splash"><div class="s-title">BSMLH</div></div>
 
     <div id="scr-reg" class="screen active">
-        <h2 style="margin-top: 40px; margin-bottom: 20px;">РЕГИСТРАЦИЯ</h2>
-        <input type="text" id="in-f" placeholder="ИМЯ" style="background:#111; border:1px solid #333; padding:16px; color:#fff; border-radius:12px; width:320px; margin-bottom:10px;">
-        <button class="btn-m" onclick="startCam()">ДАЛЕЕ</button>
+        <div class="globe-wrap">
+            <div class="globe-btn" onclick="toggleLMenu()">🌐</div>
+            <div id="l-menu" class="lang-menu">
+                <div onclick="setLang('RU')">Русский</div>
+                <div onclick="setLang('EN')">English</div>
+                <div onclick="setLang('AR')">العربية</div>
+                <div onclick="setLang('CH')">中文</div>
+            </div>
+        </div>
+        <h2 id="reg-t" style="margin-top: 80px; margin-bottom: 20px;">РЕГИСТРАЦИЯ</h2>
+        <input type="text" id="in-f" placeholder="ИМЯ" style="background:#111; border:1px solid #333; padding:16px; color:#fff; border-radius:12px; width:300px; margin-bottom:15px;">
+        <button id="reg-b" class="btn-m" onclick="startCam()">ДАЛЕЕ</button>
     </div>
 
     <div id="scr-scan" class="screen">
-        <div style="position:relative; margin-bottom:20px;">
-            <video id="video-feed" autoplay playsinline></video>
-            <div class="scan-line"></div>
-        </div>
-        <button class="btn-m" onclick="takePhoto()">СДЕЛАТЬ ФОТО</button>
+        <video id="video-feed" autoplay playsinline></video>
+        <canvas id="photo-canvas" style="display:none;"></canvas>
+        <button id="cam-b" class="btn-m" style="margin-top:30px;" onclick="takePhoto()">СДЕЛАТЬ ФОТО</button>
     </div>
 
     <div id="scr-chip" class="screen">
-        <div style="font-size: 60px; margin-bottom: 20px;">🛡️</div>
-        <h3>ОЖИДАНИЕ ЧИПА...</h3>
-        <button class="btn-m" style="margin-top:20px;" onclick="toApp()">АКТИВИРОВАТЬ СКАНЕР</button>
-        <p style="color:#555; margin-top:20px; cursor:pointer;" onclick="toApp()">ВОЙТИ БЕЗ ЧИПА</p>
+        <h3 id="chip-t">ОЖИДАНИЕ ЧИПА...</h3>
+        <div class="ring-frame">
+            <img src="https://i.imgur.com/8vW5mXw.png" alt="BSMLH Ring" id="ring-image">
+        </div>
+        <p style="font-size:12px; color:#555;">ПРИЛОЖИТЕ КОЛЬЦО К ЗАДНЕЙ ПАНЕЛИ</p>
+        <button id="chip-b" class="btn-m" style="margin-top:20px;" onclick="toApp()">ПОДТВЕРДИТЬ</button>
     </div>
 
     <div id="app">
-        <header>BSMLH vHUID</header>
-        
-        <div class="content">
-            <div id="view-maps">
-                <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d100000!2d30.3!3d59.9!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sru!2sru!4v1" allowfullscreen="" loading="lazy"></iframe>
+        <header>BSMLH</header>
+        <div class="content" id="main-content">
+            <div id="view-chat" class="chat-list"></div>
+            <div id="view-maps" style="display:none; height:100%;">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d1000!2d0!3d0!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2s!4v1" style="width:100%; height:100%; border:0;"></iframe>
             </div>
-
-            <div id="view-prof">
+            <div id="view-prof" style="display:none;">
                 <div class="wc-header">
-                    <div class="wc-av">👤</div>
+                    <img id="user-photo" src="" alt="">
                     <div class="wc-name">
-                        <h2 id="u-name">User</h2>
-                        <p>ID: bsmlh_77801</p>
+                        <h2 id="u-name-disp">User</h2>
+                        <p>ID: bsmlh_vHUID_01</p>
                     </div>
                 </div>
-                <div class="wc-list">
-                    <div class="wc-item"><span>Services</span><span class="wc-arrow">></span></div>
-                </div>
-                <div class="wc-list">
-                    <div class="wc-item"><span>Favorites</span><span class="wc-arrow">></span></div>
-                    <div class="wc-item"><span>Settings</span><span class="wc-arrow">></span></div>
-                </div>
+                <div class="wc-item"><span>Services</span><span>></span></div>
+                <div class="wc-item"><span>Settings</span><span>></span></div>
             </div>
-            
-            <div id="view-chat" style="padding:20px;">СИСТЕМА ОНЛАЙН</div>
         </div>
-
         <footer>
             <div id="n-chat" class="n-btn on" onclick="tab('chat')">CHAT</div>
             <div id="n-maps" class="n-btn" onclick="tab('maps')">MAPS</div>
@@ -117,6 +113,28 @@
     </div>
 
     <script>
+        const langs = {
+            'RU': { reg: "РЕГИСТРАЦИЯ", next: "ДАЛЕЕ", ph: "ИМЯ", chip: "ОЖИДАНИЕ ЧИПА...", act: "ПОДТВЕРДИТЬ" },
+            'EN': { reg: "REGISTRATION", next: "NEXT", ph: "NAME", chip: "WAITING FOR CHIP...", act: "CONFIRM" },
+            'AR': { reg: "تسجيل", next: "التالي", ph: "اسم", chip: "في انتظار الشريحة...", act: "تأكيد" },
+            'CH': { reg: "注册", next: "下一步", ph: "名字", chip: "等待芯片...", act: "确认" }
+        };
+
+        function toggleLMenu() {
+            const m = document.getElementById('l-menu');
+            m.style.display = (m.style.display === 'flex') ? 'none' : 'flex';
+        }
+
+        function setLang(l) {
+            const d = langs[l];
+            document.getElementById('reg-t').innerText = d.reg;
+            document.getElementById('reg-b').innerText = d.next;
+            document.getElementById('in-f').placeholder = d.ph;
+            document.getElementById('chip-t').innerText = d.chip;
+            document.getElementById('chip-b').innerText = d.act;
+            document.getElementById('l-menu').style.display = 'none';
+        }
+
         async function startCam() {
             if(!document.getElementById('in-f').value) return;
             document.getElementById('scr-reg').classList.remove('active');
@@ -126,23 +144,39 @@
         }
 
         function takePhoto() {
-            const stream = document.getElementById('video-feed').srcObject;
-            stream.getTracks().forEach(t => t.stop());
+            const video = document.getElementById('video-feed');
+            const canvas = document.getElementById('photo-canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            const data = canvas.toDataURL('image/png');
+            document.getElementById('user-photo').src = data;
+            
+            video.srcObject.getTracks().forEach(t => t.stop());
             document.getElementById('scr-scan').classList.remove('active');
             document.getElementById('scr-chip').classList.add('active');
         }
 
         function toApp() {
-            document.getElementById('u-name').innerText = document.getElementById('in-f').value;
+            document.getElementById('u-name-disp').innerText = document.getElementById('in-f').value;
             document.getElementById('scr-chip').classList.remove('active');
             document.getElementById('app').style.display = 'flex';
+            loadChats();
+        }
+
+        function loadChats() {
+            const list = document.getElementById('view-chat');
+            const names = ["Alex", "Sarah", "Ahmed", "Li Wei", "Maria", "Ivan", "Fatima", "Chen", "John", "Elena"];
+            list.innerHTML = '';
+            names.forEach(n => {
+                list.innerHTML += <div class="chat-item"><div class="chat-av">👤</div><div class="chat-info"><h4>${n}</h4><p>Last secure message...</p></div></div>;
+            });
         }
 
         function tab(t) {
             document.getElementById('view-chat').style.display = (t === 'chat' ? 'block' : 'none');
             document.getElementById('view-maps').style.display = (t === 'maps' ? 'block' : 'none');
             document.getElementById('view-prof').style.display = (t === 'prof' ? 'block' : 'none');
-            
             document.querySelectorAll('.n-btn').forEach(b => b.classList.remove('on'));
             document.getElementById('n-' + t).classList.add('on');
         }
