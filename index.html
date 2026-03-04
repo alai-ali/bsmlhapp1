@@ -3,155 +3,193 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BSMLH STABLE v7.1</title>
+    <title>BSMLH v6.7 | Final Security & UI</title>
     <style>
-        :root { --gold: #f6851b; --blue: #007aff; --bg: #000; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, Helvetica, sans-serif; }
-        body { background: var(--bg); color: #fff; height: 100vh; overflow: hidden; position: fixed; width: 100%; }
+        :root { --gold: #f6851b; --bg: #000; --wc-bg: #ededed; --blue: #007aff; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: #000; color: #fff; height: 100vh; overflow: hidden; position: fixed; width: 100%; }
 
-        /* SPLASH */
-        #splash { position: fixed; inset: 0; z-index: 9999; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; animation: fadeOut 0.4s forwards 2s; pointer-events: none; }
+        /* ЗАСТАВКА */
+        #splash { position: fixed; inset: 0; z-index: 9999; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; animation: fadeOut 0.5s forwards 2.5s; pointer-events: none; }
         @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
-        .s-title { font-size: 45px; font-weight: 900; letter-spacing: 10px; }
-        .s-sub { font-size: 9px; margin-top: 10px; text-align: center; max-width: 280px; line-height: 1.4; }
+        .s-title { font-size: 50px; font-weight: 900; letter-spacing: 12px; color: #fff; }
 
-        /* SCREENS */
-        .screen { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; padding: 20px; background: #000; z-index: 10; }
+        /* ЭКРАНЫ */
+        .screen { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; padding: 25px; background: #000; z-index: 1000; }
         .active { display: flex; }
 
-        /* GLOBE */
-        .top-nav { width: 100%; display: flex; justify-content: flex-end; padding: 10px; }
-        .g-btn { font-size: 28px; color: var(--blue); cursor: pointer; padding: 5px; }
-        #l-box { display: none; position: absolute; top: 60px; right: 20px; background: #1a1a1a; border: 1px solid #333; border-radius: 10px; z-index: 100; overflow: hidden; }
-        .l-opt { padding: 12px 25px; border-bottom: 1px solid #222; font-size: 14px; text-align: center; }
+        /* ГЛОБУС */
+        .globe-wrap { position: absolute; top: 20px; right: 20px; z-index: 2000; }
+        .globe-btn { font-size: 30px; cursor: pointer; filter: drop-shadow(0 0 5px var(--blue)); }
+        .lang-menu { position: absolute; top: 40px; right: 0; background: #1a1a1a; border: 1px solid #333; border-radius: 12px; display: none; flex-direction: column; width: 120px; overflow: hidden; }
+        .lang-menu div { padding: 12px; text-align: center; font-size: 14px; border-bottom: 1px solid #333; cursor: pointer; color: #fff; }
+        .lang-menu div:active { background: var(--blue); }
 
-        /* INPUTS & BUTTONS */
-        .inp { width: 100%; max-width: 300px; padding: 16px; margin: 15px 0; border-radius: 12px; border: 1px solid #333; background: #111; color: #fff; font-size: 16px; outline: none; }
-        .btn { width: 100%; max-width: 300px; padding: 18px; border-radius: 12px; border: none; background: var(--gold); color: #000; font-weight: bold; font-size: 15px; cursor: pointer; }
-        .skip { margin-top: 20px; color: #666; font-size: 13px; text-decoration: underline; }
+        /* КАМЕРА */
+        #video-feed { width: 260px; height: 260px; background: #111; border: 3px solid var(--gold); border-radius: 50%; object-fit: cover; transform: scaleX(-1); }
+        .cam-res { width: 64px; height: 64px; border-radius: 8px; object-fit: cover; display: none; } /* Скрытый холст для фото */
 
-        /* MEDIA */
-        #v-feed { width: 260px; height: 260px; border-radius: 50%; border: 3px solid var(--gold); object-fit: cover; background: #111; transform: scaleX(-1); }
+        /* ЭКРАН ЧИПА */
+        .ring-img { font-size: 80px; margin: 30px 0; filter: drop-shadow(0 0 10px var(--gold)); animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
 
-        /* MAIN APP */
-        #app { display: none; height: 100vh; flex-direction: column; background: #ededed; color: #000; position: absolute; inset: 0; z-index: 50; }
-        header { background: #1a1a1a; color: #fff; height: 60px; display: flex; align-items: center; justify-content: center; font-weight: bold; letter-spacing: 2px; }
-        .scroll-area { flex: 1; overflow-y: auto; }
+        /* APP STRUCTURE */
+        #app { display: none; height: 100vh; flex-direction: column; background: var(--wc-bg); z-index: 5000; position: absolute; inset: 0; color: #000; }
+        header { height: 60px; background: #1a1a1a; color: #fff; display: flex; justify-content: center; align-items: center; font-weight: 600; }
+        .content { flex: 1; overflow-y: auto; }
+
+        /* СПИСОК КОНТАКТОВ (ЧАТ) */
+        .chat-list { background: #fff; }
+        .chat-item { display: flex; padding: 12px 15px; border-bottom: 1px solid #f2f2f2; align-items: center; }
+        .chat-av { width: 48px; height: 48px; background: #eee; border-radius: 6px; margin-right: 12px; font-size: 24px; display: flex; align-items: center; justify-content: center; }
+        .chat-info { flex: 1; }
+        .chat-info h4 { font-size: 16px; font-weight: 500; }
+        .chat-info p { color: #999; font-size: 13px; margin-top: 2px; }
+
+        /* ПРОФИЛЬ */
+        .wc-header { background: #fff; padding: 30px 20px; display: flex; align-items: center; margin-bottom: 10px; }
+        #user-photo { width: 64px; height: 64px; border-radius: 8px; margin-right: 15px; background: #eee; object-fit: cover; }
+        .wc-item { background: #fff; padding: 15px 20px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; }
+
+        footer { height: 85px; padding-bottom: 25px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #ddd; background: #f7f7f7; }
+        .n-btn { color: #999; font-size: 10px; font-weight: bold; text-transform: uppercase; text-align: center; }
+        .n-btn.on { color: #07c160; }
         
-        .c-item { display: flex; align-items: center; padding: 12px 15px; border-bottom: 1px solid #ddd; background: #fff; }
-        .c-av { width: 48px; height: 48px; background: #eee; border-radius: 8px; margin-right: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
-        
-        .p-box { background: #fff; padding: 25px 20px; display: flex; align-items: center; margin-bottom: 10px; }
-        #p-img { width: 64px; height: 64px; border-radius: 8px; background: #eee; object-fit: cover; margin-right: 15px; }
-
-        footer { display: flex; justify-content: space-around; padding: 15px 0 35px; background: #f7f7f7; border-top: 1px solid #ccc; }
-        .n-tab { color: #999; font-size: 11px; font-weight: bold; text-align: center; }
-        .n-tab.on { color: #07c160; }
+        .btn-m { background: var(--gold); color: #000; border: none; padding: 18px; border-radius: 12px; font-weight: bold; width: 100%; max-width: 300px; }
     </style>
 </head>
 <body>
 
-    <div id="splash">
-        <div class="s-title">BSMLH</div>
-        <div class="s-sub">BIOMETRIC SECURITY MULTIFUNCTION LEDGER FOR HUMANITY</div>
-    </div>
+    <div id="splash"><div class="s-title">BSMLH</div></div>
 
-    <div id="scr-1" class="screen active">
-        <div class="top-nav"><div class="g-btn" onclick="openL()">🌐</div></div>
-        <div id="l-box">
-            <div class="l-opt" onclick="setL('RU')">Русский</div>
-            <div class="l-opt" onclick="setL('EN')">English</div>
-            <div class="l-opt" onclick="setL('AR')">العربية</div>
-            <div class="l-opt" onclick="setL('CH')">中文</div>
+    <div id="scr-reg" class="screen active">
+        <div class="globe-wrap">
+            <div class="globe-btn" onclick="toggleLMenu()">🌐</div>
+            <div id="l-menu" class="lang-menu">
+                <div onclick="setLang('RU')">Русский</div>
+                <div onclick="setLang('EN')">English</div>
+                <div onclick="setLang('AR')">العربية</div>
+                <div onclick="setLang('CH')">中文</div>
+            </div>
         </div>
-        <h2 id="t-reg" style="margin-top: 60px;">РЕГИСТРАЦИЯ</h2>
-        <input type="text" id="u-name" placeholder="ИМЯ" class="inp">
-        <button id="b-1" class="btn" onclick="toScan()">ДАЛЕЕ</button>
+        <h2 id="reg-t" style="margin-top: 80px; margin-bottom: 20px;">РЕГИСТРАЦИЯ</h2>
+        <input type="text" id="in-f" placeholder="ИМЯ" style="background:#111; border:1px solid #333; padding:16px; color:#fff; border-radius:12px; width:300px; margin-bottom:15px;">
+        <button id="reg-b" class="btn-m" onclick="startCam()">ДАЛЕЕ</button>
     </div>
 
-    <div id="scr-2" class="screen">
-        <video id="v-feed" autoplay playsinline></video>
-        <button id="b-2" class="btn" style="margin-top: 30px;" onclick="doPhoto()">СДЕЛАТЬ ФОТО</button>
+    <div id="scr-scan" class="screen">
+        <video id="video-feed" autoplay playsinline></video>
+        <canvas id="photo-canvas" style="display:none;"></canvas>
+        <button id="cam-b" class="btn-m" style="margin-top:30px;" onclick="takePhoto()">СДЕЛАТЬ ФОТО</button>
     </div>
 
-    <div id="scr-3" class="screen">
-        <h3 id="t-chip" style="margin-top: 50px;">ОЖИДАНИЕ ЧИПА...</h3>
-        <div style="font-size: 90px; margin: 40px;">💍</div>
-        <button id="b-3" class="btn" onclick="toApp()">ПОДТВЕРДИТЬ</button>
-        <div class="skip" onclick="toApp()">ВОЙТИ БЕЗ ЧИПА</div>
+    <div id="scr-chip" class="screen">
+        <div class="ring-img">💍</div>
+        <h3 id="chip-t">ОЖИДАНИЕ ЧИПА...</h3>
+        <p style="font-size:12px; color:#555; margin-top:10px;">ПРИЛОЖИТЕ КОЛЬЦО К ТЕЛЕФОНУ</p>
+        <button id="chip-b" class="btn-m" style="margin-top:30px;" onclick="toApp()">АКТИВИРОВАТЬ</button>
     </div>
 
     <div id="app">
-        <header>BSMLH</header>
-        <div class="scroll-area">
-            <div id="v-chat"></div>
-            <div id="v-prof" style="display:none;">
-                <div class="p-box">
-                    <img id="p-img" src="">
-                    <div><h3 id="disp-name">User</h3><p style="color:#888; font-size:13px;">ID: 77801-BS</p></div>
+        <header id="app-h">BSMLH</header>
+        <div class="content">
+            <div id="view-chat" class="chat-list"></div>
+
+            <div id="view-maps" style="display:none; height:100%;">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d100000!2d30!3d50!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sru!2s!4v1700000000000" style="width:100%; height:100%; border:0;"></iframe>
+            </div>
+
+            <div id="view-prof" style="display:none;">
+                <div class="wc-header">
+                    <img id="user-photo" src="" alt="">
+                    <div class="wc-name">
+                        <h2 id="u-name-disp">User</h2>
+                        <p>ID: bsmlh_vHUID_01</p>
+                    </div>
                 </div>
-                <div style="background:#fff; padding:15px 20px; border-bottom:1px solid #eee;">Services</div>
+                <div class="wc-item"><span>Services</span><span>></span></div>
+                <div class="wc-item"><span>Settings</span><span>></span></div>
             </div>
         </div>
+
         <footer>
-            <div class="n-tab on" id="tab-c" onclick="show('chat')">CHAT</div>
-            <div class="n-tab" id="tab-p" onclick="show('prof')">PROFILE</div>
+            <div id="n-chat" class="n-btn on" onclick="tab('chat')">CHAT</div>
+            <div id="n-maps" class="n-btn" onclick="tab('maps')">MAPS</div>
+            <div id="n-prof" class="n-btn" onclick="tab('prof')">PROFILE</div>
         </footer>
     </div>
 
-    <canvas id="c-hidden" style="display:none;"></canvas>
-
     <script>
-        const dic = {
-            'RU': {r:"РЕГИСТРАЦИЯ", n:"ДАЛЕЕ", c:"ОЖИДАНИЕ ЧИПА...", f:"ПОДТВЕРДИТЬ"},
-            'EN': {r:"REGISTRATION", n:"NEXT", c:"WAITING FOR CHIP...", f:"CONFIRM"},
-            'AR': {r:"تسجيل", n:"التالي", c:"انتظار الشريحة...", f:"تأكيد"},
-            'CH': {r:"注册", n:"下一步", c:"等待芯片...", f:"确认"}
+        const langs = {
+            'RU': { reg: "РЕГИСТРАЦИЯ", next: "ДАЛЕЕ", ph: "ИМЯ", chip: "ОЖИДАНИЕ ЧИПА...", act: "АКТИВИРОВАТЬ" },
+            'EN': { reg: "REGISTRATION", next: "NEXT", ph: "NAME", chip: "WAITING FOR CHIP...", act: "ACTIVATE" },
+            'AR': { reg: "تسجيل", next: "التالي", ph: "اسم", chip: "في انتظار الشريحة...", act: "تفعيل" },
+            'CH': { reg: "注册", next: "下一步", ph: "名字", chip: "等待芯片...", act: "激活" }
         };
 
-        function openL() { const b = document.getElementById('l-box'); b.style.display = b.style.display === 'block' ? 'none' : 'block'; }
-        
-        function setL(l) {
-            document.getElementById('t-reg').innerText = dic[l].r;
-            document.getElementById('b-1').innerText = dic[l].n;
-            document.getElementById('t-chip').innerText = dic[l].c;
-            document.getElementById('b-3').innerText = dic[l].f;
-            openL();
+        function toggleLMenu() {
+            const m = document.getElementById('l-menu');
+            m.style.display = (m.style.display === 'flex') ? 'none' : 'flex';
         }
 
-        async function toScan() {
-            if(!document.getElementById('u-name').value) return;
-            document.getElementById('scr-1').style.display = 'none';
-            document.getElementById('scr-2').style.display = 'flex';
-            const s = await navigator.mediaDevices.getUserMedia({video:{facingMode:"user"}});
-            document.getElementById('v-feed').srcObject = s;
+        function setLang(l) {
+            const d = langs[l];
+            document.getElementById('reg-t').innerText = d.reg;
+            document.getElementById('reg-b').innerText = d.next;
+            document.getElementById('in-f').placeholder = d.ph;
+            document.getElementById('chip-t').innerText = d.chip;
+            document.getElementById('chip-b').innerText = d.act;
+            document.getElementById('l-menu').style.display = 'none';
         }
 
-        function doPhoto() {
-            const v = document.getElementById('v-feed');
-            const can = document.getElementById('c-hidden');
-            can.width = v.videoWidth; can.height = v.videoHeight;
-            can.getContext('2d').drawImage(v, 0, 0);
-            document.getElementById('p-img').src = can.toDataURL('image/png');
-            v.srcObject.getTracks().forEach(t => t.stop());
-            document.getElementById('scr-2').style.display = 'none';
-            document.getElementById('scr-3').style.display = 'flex';
+        async function startCam() {
+            if(!document.getElementById('in-f').value) return;
+            document.getElementById('scr-reg').classList.remove('active');
+            document.getElementById('scr-scan').classList.add('active');
+            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+            document.getElementById('video-feed').srcObject = stream;
+        }
+
+        function takePhoto() {
+            const video = document.getElementById('video-feed');
+            const canvas = document.getElementById('photo-canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            const data = canvas.toDataURL('image/png');
+            document.getElementById('user-photo').src = data; // Установка фото в профиль
+            
+            const stream = video.srcObject;
+            stream.getTracks().forEach(t => t.stop());
+            document.getElementById('scr-scan').classList.remove('active');
+            document.getElementById('scr-chip').classList.add('active');
         }
 
         function toApp() {
-            document.getElementById('disp-name').innerText = document.getElementById('u-name').value;
-            document.getElementById('scr-3').style.display = 'none';
+            document.getElementById('u-name-disp').innerText = document.getElementById('in-f').value;
+            document.getElementById('scr-chip').classList.remove('active');
             document.getElementById('app').style.display = 'flex';
-            const chat = document.getElementById('v-chat');
-            chat.innerHTML = ["Alex", "Sarah", "Ahmed", "Li", "Maria", "Ivan", "Fatima", "Chen", "John", "Elena"]
-                .map(n => <div class="c-item"><div class="c-av">👤</div><div><h4>${n}</h4><p style="color:#999;font-size:12px;">Secure...</p></div></div>).join('');
+            loadChats();
         }
 
-        function show(t) {
-            document.getElementById('v-chat').style.display = t === 'chat' ? 'block' : 'none';
-            document.getElementById('v-prof').style.display = t === 'prof' ? 'block' : 'none';
-            document.getElementById('tab-c').className = 'n-tab' + (t==='chat'?' on':'');
-            document.getElementById('tab-p').className = 'n-tab' + (t==='prof'?' on':'');
+        function loadChats() {
+            const list = document.getElementById('view-chat');
+            const names = ["Alex", "Sarah", "Ahmed", "Li Wei", "Maria", "Ivan", "Fatima", "Chen", "John", "Elena"];
+            list.innerHTML = '';
+            names.forEach(n => {
+                list.innerHTML += `<div class="chat-item">
+                    <div class="chat-av">👤</div>
+                    <div class="chat-info"><h4>${n}</h4><p>Last secure message...</p></div>
+                </div>`;
+            });
+        }
+
+        function tab(t) {
+            document.getElementById('view-chat').style.display = (t === 'chat' ? 'block' : 'none');
+            document.getElementById('view-maps').style.display = (t === 'maps' ? 'block' : 'none');
+            document.getElementById('view-prof').style.display = (t === 'prof' ? 'block' : 'none');
+            document.querySelectorAll('.n-btn').forEach(b => b.classList.remove('on'));
+            document.getElementById('n-' + t).classList.add('on');
         }
     </script>
 </body>
