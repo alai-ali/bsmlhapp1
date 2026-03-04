@@ -3,100 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BSMLH v6.4 | Security Layer</title>
+    <title>BSMLH v6.5 | Advanced Tech</title>
     <style>
-        :root { --gold: #f6851b; --bg: #000; --border: #222; }
+        :root { --gold: #f6851b; --bg: #000; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background: #000; color: #fff; height: 100vh; overflow: hidden; position: fixed; width: 100%; }
 
         /* ЗАСТАВКА */
-        #splash { position: fixed; inset: 0; z-index: 9999; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; animation: fadeOut 0.5s forwards 2s; pointer-events: none; }
+        #splash { position: fixed; inset: 0; z-index: 9999; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; animation: fadeOut 0.5s forwards 3s; pointer-events: none; }
         @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
+        .s-title { font-size: 50px; font-weight: 900; letter-spacing: 12px; color: #fff; }
+        .s-sub { font-size: 10px; color: #fff; margin-top: 15px; text-align: center; max-width: 80%; text-transform: uppercase; }
 
         /* ЭКРАНЫ */
-        .screen { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 25px; background: #000; z-index: 1000; }
+        .screen { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; padding: 25px; background: #000; z-index: 1000; }
         .active { display: flex; }
 
-        /* СКАНЕР ЛИЦА */
-        .scanner-frame { width: 220px; height: 280px; border: 2px solid var(--gold); border-radius: 40% 40% 50% 50%; position: relative; overflow: hidden; margin-bottom: 20px; }
-        .scan-line { position: absolute; width: 100%; height: 4px; background: var(--gold); box-shadow: 0 0 15px var(--gold); top: 0; animation: scan 2s infinite; }
+        /* КАМЕРА */
+        #video-feed { width: 240px; height: 300px; background: #111; border: 2px solid var(--gold); border-radius: 20px; object-fit: cover; transform: scaleX(-1); }
+        .cam-box { position: relative; margin-bottom: 20px; }
+        .scan-line { position: absolute; width: 100%; height: 2px; background: var(--gold); top: 0; animation: scan 2s infinite; z-index: 2; }
         @keyframes scan { 0% { top: 0; } 50% { top: 100%; } 100% { top: 0; } }
 
-        /* ОКНО ЧИПА */
-        .chip-box { background: #0a0a0a; border: 1px solid #333; border-radius: 20px; padding: 30px; text-align: center; width: 100%; max-width: 320px; }
-        .chip-icon { font-size: 60px; margin-bottom: 20px; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
-
-        /* ФОРМА И КНОПКИ */
+        /* КНОПКИ */
         .f-box { width: 100%; max-width: 320px; display: flex; flex-direction: column; gap: 10px; }
-        input { background: #111 !important; border: 1px solid #333; padding: 16px; color: #fff !important; border-radius: 12px; font-size: 16px; outline: none; }
+        input { background: #111; border: 1px solid #333; padding: 16px; color: #fff; border-radius: 12px; font-size: 16px; outline: none; }
         .btn-m { background: var(--gold); color: #000; border: none; padding: 20px; border-radius: 12px; font-weight: bold; text-transform: uppercase; cursor: pointer; }
-        .btn-link { color: #555; font-size: 12px; margin-top: 20px; text-decoration: underline; cursor: pointer; }
+        .btn-link { color: #555; font-size: 11px; margin-top: 20px; text-decoration: underline; cursor: pointer; }
 
-        /* ПРИЛОЖЕНИЕ */
         #app { display: none; height: 100vh; flex-direction: column; background: #000; z-index: 5000; position: absolute; inset: 0; }
-        header { height: 70px; display: flex; justify-content: center; align-items: center; border-bottom: 1px solid #222; }
-        footer { height: 100px; padding-bottom: 35px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #222; }
-        .n-btn { color: #444; font-size: 11px; font-weight: bold; text-transform: uppercase; }
-        .n-btn.on { color: var(--gold); }
     </style>
 </head>
 <body>
 
     <div id="splash">
-        <h1 style="color:#fff; letter-spacing:10px;">BSMLH</h1>
+        <div class="s-title">BSMLH</div>
+        <div class="s-sub">BIOMETRIC SECURITY MULTIFUNCTION LEDGER FOR HUMANITY</div>
     </div>
 
     <div id="scr-reg" class="screen active">
-        <h2 style="margin-bottom:20px;">РЕГИСТРАЦИЯ</h2>
+        <h2 style="margin-top: 40px; margin-bottom: 20px;">РЕГИСТРАЦИЯ</h2>
         <div class="f-box">
             <input type="text" id="in-f" placeholder="ИМЯ">
-            <input type="text" id="in-l" placeholder="ФАМИЛИЯ">
-            <button class="btn-m" onclick="toScan()">ДАЛЕЕ</button>
+            <button class="btn-m" onclick="startCam()">ДАЛЕЕ</button>
         </div>
     </div>
 
     <div id="scr-scan" class="screen">
-        <div class="scanner-frame"><div class="scan-line"></div></div>
-        <p id="scan-txt">ИДЕНТИФИКАЦИЯ ЛИЦА...</p>
+        <div class="cam-box">
+            <video id="video-feed" autoplay playsinline></video>
+            <div class="scan-line"></div>
+        </div>
+        <div class="f-box">
+            <button class="btn-m" onclick="takePhoto()">СДЕЛАТЬ ФОТО</button>
+        </div>
     </div>
 
     <div id="scr-chip" class="screen">
-        <div class="chip-box">
-            <div class="chip-icon">🛡️</div>
-            <h3 style="margin-bottom:10px;">ЗАЩИТА УРОВНЯ vHUID</h3>
-            <p style="font-size:12px; color:#888; margin-bottom:20px;">ПРИЛОЖИТЕ ЧИП ИЛИ КОЛЬЦО К ЗАДНЕЙ ПАНЕЛИ ТЕЛЕФОНА</p>
-            <button class="btn-m" style="width:100%" onclick="toApp()">ПРИЛОЖИТЬ ЧИП</button>
-            <div class="btn-link" onclick="toApp()">ВОЙТИ БЕЗ ЧИПА (ОГРАНИЧЕННЫЙ ДОСТУП)</div>
+        <div style="font-size: 60px; margin-bottom: 20px;">🛡️</div>
+        <h3 id="nfc-status">ОЖИДАНИЕ ЧИПА...</h3>
+        <p style="font-size: 12px; color: #666; text-align: center; margin: 15px 0;">ПРИЛОЖИТЕ NFC ЧИП К ЗАДНЕЙ ПАНЕЛИ</p>
+        <div class="f-box">
+            <button class="btn-m" onclick="startNFC()">АКТИВИРОВАТЬ СКАНЕР</button>
+            <div class="btn-link" onclick="toApp()">ВОЙТИ БЕЗ ЧИПА</div>
         </div>
     </div>
 
     <div id="app">
-        <header><div style="font-weight:900; letter-spacing:4px;">BSMLH</div></header>
-        <div style="flex:1; padding:20px;">
+        <header style="height:70px; border-bottom:1px solid #222; display:flex; justify-content:center; align-items:center;">
+            <div style="font-weight:900; letter-spacing:4px;">BSMLH</div>
+        </header>
+        <div style="padding:20px;">
             <div style="background:#111; padding:15px; border-radius:12px; border-left:4px solid var(--gold);">
-                СИСТЕМА: ПОЛНАЯ ЗАЩИТА АКТИВИРОВАНА.
+                ДОСТУП РАЗРЕШЕН.
             </div>
         </div>
-        <footer>
-            <div class="n-btn on">CHAT</div>
-            <div class="n-btn">MAPS</div>
-            <div class="n-btn">HUB</div>
-            <div class="n-btn">PROFILE</div>
-        </footer>
     </div>
 
     <script>
-        function toScan() {
+        // 1. Работа с камерой
+        async function startCam() {
             if(!document.getElementById('in-f').value) return;
             document.getElementById('scr-reg').classList.remove('active');
             document.getElementById('scr-scan').classList.add('active');
             
-            // Через 3 секунды сканирования переходим к чипу
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+                document.getElementById('video-feed').srcObject = stream;
+            } catch (err) {
+                alert("Камера недоступна");
+                toChipScreen();
+            }
+        }
+
+        function takePhoto() {
+            const video = document.getElementById('video-feed');
+            video.pause(); // Эффект снимка
             setTimeout(() => {
-                document.getElementById('scr-scan').classList.remove('active');
-                document.getElementById('scr-chip').classList.add('active');
-            }, 3000);
+                const stream = video.srcObject;
+                stream.getTracks().forEach(track => track.stop()); // Выключаем камеру
+                toChipScreen();
+            }, 1000);
+        }
+
+        function toChipScreen() {
+            document.getElementById('scr-scan').classList.remove('active');
+            document.getElementById('scr-chip').classList.add('active');
+        }
+
+        // 2. Реальный NFC (работает в Chrome на Android)
+        async function startNFC() {
+            if ('NDEFReader' in window) {
+                try {
+                    const ndef = new NDEFReader();
+                    await ndef.scan();
+                    document.getElementById('nfc-status').innerText = "ПОИСК ЧИПА...";
+                    
+                    ndef.onreading = event => {
+                        document.getElementById('nfc-status').innerText = "ЧИП ПОДТВЕРЖДЕН!";
+                        document.getElementById('nfc-status').style.color = "#f6851b";
+                        setTimeout(toApp, 1000);
+                    };
+                } catch (error) {
+                    alert("Ошибка NFC: " + error);
+                }
+            } else {
+                alert("Ваш браузер не поддерживает NFC. Используйте вход без чипа.");
+            }
         }
 
         function toApp() {
