@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BSMLH v6.7 | Final Security & UI</title>
+    <title>BSMLH v6.8 Fixed</title>
     <style>
         :root { --gold: #f6851b; --bg: #000; --wc-bg: #ededed; --blue: #007aff; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -20,42 +20,34 @@
 
         /* ГЛОБУС */
         .globe-wrap { position: absolute; top: 20px; right: 20px; z-index: 2000; }
-        .globe-btn { font-size: 30px; cursor: pointer; filter: drop-shadow(0 0 5px var(--blue)); }
+        .globe-btn { font-size: 30px; cursor: pointer; }
         .lang-menu { position: absolute; top: 40px; right: 0; background: #1a1a1a; border: 1px solid #333; border-radius: 12px; display: none; flex-direction: column; width: 120px; overflow: hidden; }
         .lang-menu div { padding: 12px; text-align: center; font-size: 14px; border-bottom: 1px solid #333; cursor: pointer; color: #fff; }
-        .lang-menu div:active { background: var(--blue); }
 
         /* КАМЕРА */
         #video-feed { width: 260px; height: 260px; background: #111; border: 3px solid var(--gold); border-radius: 50%; object-fit: cover; transform: scaleX(-1); }
-        .cam-res { width: 64px; height: 64px; border-radius: 8px; object-fit: cover; display: none; } /* Скрытый холст для фото */
 
         /* ЭКРАН ЧИПА */
-        .ring-img { font-size: 80px; margin: 30px 0; filter: drop-shadow(0 0 10px var(--gold)); animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
-
-        /* APP STRUCTURE */
+        .ring-frame { width: 260px; height: 260px; margin: 20px 0; border-radius: 20px; overflow: hidden; border: 1px solid #222; }
+        .ring-frame img { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; }
+        
+        /* APP UI */
         #app { display: none; height: 100vh; flex-direction: column; background: var(--wc-bg); z-index: 5000; position: absolute; inset: 0; color: #000; }
         header { height: 60px; background: #1a1a1a; color: #fff; display: flex; justify-content: center; align-items: center; font-weight: 600; }
         .content { flex: 1; overflow-y: auto; }
-
-        /* СПИСОК КОНТАКТОВ (ЧАТ) */
-        .chat-list { background: #fff; }
-        .chat-item { display: flex; padding: 12px 15px; border-bottom: 1px solid #f2f2f2; align-items: center; }
+        .chat-item { display: flex; padding: 12px 15px; border-bottom: 1px solid #f2f2f2; align-items: center; background: #fff; }
         .chat-av { width: 48px; height: 48px; background: #eee; border-radius: 6px; margin-right: 12px; font-size: 24px; display: flex; align-items: center; justify-content: center; }
-        .chat-info { flex: 1; }
-        .chat-info h4 { font-size: 16px; font-weight: 500; }
-        .chat-info p { color: #999; font-size: 13px; margin-top: 2px; }
 
         /* ПРОФИЛЬ */
         .wc-header { background: #fff; padding: 30px 20px; display: flex; align-items: center; margin-bottom: 10px; }
         #user-photo { width: 64px; height: 64px; border-radius: 8px; margin-right: 15px; background: #eee; object-fit: cover; }
-        .wc-item { background: #fff; padding: 15px 20px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; }
 
         footer { height: 85px; padding-bottom: 25px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #ddd; background: #f7f7f7; }
-        .n-btn { color: #999; font-size: 10px; font-weight: bold; text-transform: uppercase; text-align: center; }
+        .n-btn { color: #999; font-size: 10px; font-weight: bold; text-transform: uppercase; }
         .n-btn.on { color: #07c160; }
         
-        .btn-m { background: var(--gold); color: #000; border: none; padding: 18px; border-radius: 12px; font-weight: bold; width: 100%; max-width: 300px; }
+        .btn-m { background: var(--gold); color: #000; border: none; padding: 18px; border-radius: 12px; font-weight: bold; width: 100%; max-width: 300px; cursor: pointer; }
+        .btn-link { color: #555; font-size: 12px; margin-top: 15px; text-decoration: underline; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -84,21 +76,21 @@
     </div>
 
     <div id="scr-chip" class="screen">
-        <div class="ring-img">💍</div>
         <h3 id="chip-t">ОЖИДАНИЕ ЧИПА...</h3>
-        <p style="font-size:12px; color:#555; margin-top:10px;">ПРИЛОЖИТЕ КОЛЬЦО К ТЕЛЕФОНУ</p>
-        <button id="chip-b" class="btn-m" style="margin-top:30px;" onclick="toApp()">АКТИВИРОВАТЬ</button>
+        <div class="ring-frame">
+            <img src="https://i.imgur.com/8vW5mXw.png" alt="Ring" loading="lazy">
+        </div>
+        <button id="chip-b" class="btn-m" onclick="toApp()">ПОДТВЕРДИТЬ</button>
+        <div class="btn-link" onclick="toApp()">ВОЙТИ БЕЗ ЧИПА</div>
     </div>
 
     <div id="app">
-        <header id="app-h">BSMLH</header>
+        <header>BSMLH</header>
         <div class="content">
-            <div id="view-chat" class="chat-list"></div>
-
+            <div id="view-chat"></div>
             <div id="view-maps" style="display:none; height:100%;">
-                <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d100000!2d30!3d50!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sru!2s!4v1700000000000" style="width:100%; height:100%; border:0;"></iframe>
+                <iframe src="about:blank" id="map-frame" style="width:100%; height:100%; border:0;"></iframe>
             </div>
-
             <div id="view-prof" style="display:none;">
                 <div class="wc-header">
                     <img id="user-photo" src="" alt="">
@@ -111,7 +103,6 @@
                 <div class="wc-item"><span>Settings</span><span>></span></div>
             </div>
         </div>
-
         <footer>
             <div id="n-chat" class="n-btn on" onclick="tab('chat')">CHAT</div>
             <div id="n-maps" class="n-btn" onclick="tab('maps')">MAPS</div>
@@ -121,10 +112,10 @@
 
     <script>
         const langs = {
-            'RU': { reg: "РЕГИСТРАЦИЯ", next: "ДАЛЕЕ", ph: "ИМЯ", chip: "ОЖИДАНИЕ ЧИПА...", act: "АКТИВИРОВАТЬ" },
-            'EN': { reg: "REGISTRATION", next: "NEXT", ph: "NAME", chip: "WAITING FOR CHIP...", act: "ACTIVATE" },
-            'AR': { reg: "تسجيل", next: "التالي", ph: "اسم", chip: "في انتظار الشريحة...", act: "تفعيل" },
-            'CH': { reg: "注册", next: "下一步", ph: "名字", chip: "等待芯片...", act: "激活" }
+            'RU': { reg: "РЕГИСТРАЦИЯ", next: "ДАЛЕЕ", ph: "ИМЯ", chip: "ОЖИДАНИЕ ЧИПА...", act: "ПОДТВЕРДИТЬ" },
+            'EN': { reg: "REGISTRATION", next: "NEXT", ph: "NAME", chip: "WAITING FOR CHIP...", act: "CONFIRM" },
+            'AR': { reg: "تسجيل", next: "التالي", ph: "اسم", chip: "في انتظار الشريحة...", act: "تأكيد" },
+            'CH': { reg: "注册", next: "下一步", ph: "名字", chip: "等待芯片...", act: "确认" }
         };
 
         function toggleLMenu() {
@@ -156,11 +147,8 @@
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             canvas.getContext('2d').drawImage(video, 0, 0);
-            const data = canvas.toDataURL('image/png');
-            document.getElementById('user-photo').src = data; // Установка фото в профиль
-            
-            const stream = video.srcObject;
-            stream.getTracks().forEach(t => t.stop());
+            document.getElementById('user-photo').src = canvas.toDataURL('image/png');
+            video.srcObject.getTracks().forEach(t => t.stop());
             document.getElementById('scr-scan').classList.remove('active');
             document.getElementById('scr-chip').classList.add('active');
         }
@@ -175,13 +163,7 @@
         function loadChats() {
             const list = document.getElementById('view-chat');
             const names = ["Alex", "Sarah", "Ahmed", "Li Wei", "Maria", "Ivan", "Fatima", "Chen", "John", "Elena"];
-            list.innerHTML = '';
-            names.forEach(n => {
-                list.innerHTML += `<div class="chat-item">
-                    <div class="chat-av">👤</div>
-                    <div class="chat-info"><h4>${n}</h4><p>Last secure message...</p></div>
-                </div>`;
-            });
+            list.innerHTML = names.map(n => <div class="chat-item"><div class="chat-av">👤</div><div class="chat-info"><h4>${n}</h4><p>Secure connection...</p></div></div>).join('');
         }
 
         function tab(t) {
@@ -190,6 +172,7 @@
             document.getElementById('view-prof').style.display = (t === 'prof' ? 'block' : 'none');
             document.querySelectorAll('.n-btn').forEach(b => b.classList.remove('on'));
             document.getElementById('n-' + t).classList.add('on');
+            if(t === 'maps') document.getElementById('map-frame').src = "https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d1000!2d0!3d0!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2s!4v1";
         }
     </script>
 </body>
