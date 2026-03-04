@@ -3,183 +3,150 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BSMLH v6.9 | Stable Foundation</title>
+    <title>BSMLH v7.0</title>
     <style>
-        :root { --gold: #f6851b; --bg: #000; --wc-bg: #ededed; --blue: #007aff; }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background: #000; color: #fff; height: 100vh; overflow: hidden; position: fixed; width: 100%; }
+        :root { --gold: #f6851b; --blue: #007aff; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
+        body { background: #000; color: #fff; height: 100vh; overflow: hidden; }
 
-        /* ЗАСТАВКА (СТРОГО ПО ПЛАНУ) */
-        #splash { position: fixed; inset: 0; z-index: 9999; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; animation: fadeOut 0.5s forwards 2.5s; pointer-events: none; }
+        /* ЗАСТАВКА */
+        #splash { position: fixed; inset: 0; z-index: 9999; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; animation: fadeOut 0.5s forwards 2s; }
         @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
-        .s-title { font-size: 50px; font-weight: 900; letter-spacing: 12px; color: #fff; }
-        .s-sub { font-size: 10px; color: #fff; margin-top: 15px; text-align: center; max-width: 80%; text-transform: uppercase; }
 
         /* ЭКРАНЫ */
-        .screen { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; padding: 25px; background: #000; z-index: 1000; }
+        .screen { position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; padding: 20px; background: #000; }
         .active { display: flex; }
 
-        /* ГЛОБУС */
-        .globe-wrap { position: absolute; top: 20px; right: 20px; z-index: 2000; }
-        .globe-btn { font-size: 30px; cursor: pointer; color: var(--blue); }
-        .lang-menu { position: absolute; top: 40px; right: 0; background: #1a1a1a; border: 1px solid #333; border-radius: 12px; display: none; flex-direction: column; width: 120px; overflow: hidden; }
-        .lang-menu div { padding: 12px; text-align: center; font-size: 14px; border-bottom: 1px solid #333; cursor: pointer; color: #fff; }
+        /* ГЛОБУС И МЕНЮ */
+        .top-bar { width: 100%; display: flex; justify-content: flex-end; padding: 10px; }
+        #l-menu { display: none; background: #222; position: absolute; top: 50px; right: 20px; border-radius: 10px; z-index: 100; }
+        .l-item { padding: 15px 25px; border-bottom: 1px solid #333; cursor: pointer; }
+
+        /* ФОРМЫ */
+        input { width: 100%; max-width: 300px; padding: 15px; margin: 10px 0; border-radius: 10px; border: 1px solid #333; background: #111; color: #fff; font-size: 16px; }
+        .btn { width: 100%; max-width: 300px; padding: 18px; border-radius: 10px; border: none; background: var(--gold); color: #000; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .link { margin-top: 20px; color: #666; text-decoration: underline; font-size: 14px; }
 
         /* КАМЕРА */
-        #video-feed { width: 260px; height: 260px; background: #111; border: 3px solid var(--gold); border-radius: 50%; object-fit: cover; transform: scaleX(-1); }
+        video { width: 250px; height: 250px; border-radius: 50%; border: 3px solid var(--gold); object-fit: cover; background: #111; }
 
-        /* ЭКРАН ЧИПА */
-        .ring-frame { width: 260px; height: 260px; margin: 20px 0; border-radius: 20px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
-        .ring-frame img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        /* APP */
+        #app { display: none; height: 100vh; flex-direction: column; background: #f0f0f0; color: #000; position: absolute; inset: 0; z-index: 5000; }
+        header { background: #1a1a1a; color: #fff; padding: 15px; text-align: center; font-weight: bold; letter-spacing: 2px; }
+        .main { flex: 1; overflow-y: auto; }
+        .c-item { display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #ddd; background: #fff; }
+        .c-av { width: 50px; height: 50px; background: #eee; border-radius: 8px; margin-right: 15px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
         
-        /* APP UI */
-        #app { display: none; height: 100vh; flex-direction: column; background: var(--wc-bg); z-index: 5000; position: absolute; inset: 0; color: #000; }
-        header { height: 60px; background: #1a1a1a; color: #fff; display: flex; justify-content: center; align-items: center; font-weight: 600; }
-        .content { flex: 1; overflow-y: auto; }
-        .chat-item { display: flex; padding: 12px 15px; border-bottom: 1px solid #f2f2f2; align-items: center; background: #fff; }
-        .chat-av { width: 48px; height: 48px; background: #eee; border-radius: 6px; margin-right: 12px; font-size: 24px; display: flex; align-items: center; justify-content: center; }
-
-        /* ПРОФИЛЬ */
-        .wc-header { background: #fff; padding: 30px 20px; display: flex; align-items: center; margin-bottom: 10px; }
-        #user-photo { width: 64px; height: 64px; border-radius: 8px; margin-right: 15px; background: #eee; object-fit: cover; }
-
-        footer { height: 85px; padding-bottom: 25px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #ddd; background: #f7f7f7; }
-        .n-btn { color: #999; font-size: 10px; font-weight: bold; text-transform: uppercase; }
+        footer { display: flex; justify-content: space-around; padding: 15px 0 30px; background: #f8f8f8; border-top: 1px solid #ddd; }
+        .n-btn { color: #999; font-size: 12px; font-weight: bold; }
         .n-btn.on { color: #07c160; }
-        
-        .btn-m { background: var(--gold); color: #000; border: none; padding: 18px; border-radius: 12px; font-weight: bold; width: 100%; max-width: 300px; cursor: pointer; }
-        .btn-link { color: #555; font-size: 12px; margin-top: 15px; text-decoration: underline; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div id="splash">
-        <div class="s-title">BSMLH</div>
-        <div class="s-sub">BIOMETRIC SECURITY MULTIFUNCTION LEDGER FOR HUMANITY</div>
+        <h1 style="font-size: 40px; letter-spacing: 10px;">BSMLH</h1>
+        <p style="font-size: 8px; margin-top: 10px;">BIOMETRIC SECURITY MULTIFUNCTION LEDGER FOR HUMANITY</p>
     </div>
 
     <div id="scr-reg" class="screen active">
-        <div class="globe-wrap">
-            <div class="globe-btn" onclick="toggleLMenu()">🌐</div>
-            <div id="l-menu" class="lang-menu">
-                <div onclick="setLang('RU')">Русский</div>
-                <div onclick="setLang('EN')">English</div>
-                <div onclick="setLang('AR')">العربية</div>
-                <div onclick="setLang('CH')">中文</div>
-            </div>
+        <div class="top-bar"><span onclick="toggleL()" style="font-size: 30px; color: var(--blue);">🌐</span></div>
+        <div id="l-menu">
+            <div class="l-item" onclick="setL('RU')">RU</div>
+            <div class="l-item" onclick="setL('EN')">EN</div>
+            <div class="l-item" onclick="setL('AR')">AR</div>
+            <div class="l-item" onclick="setL('CH')">CH</div>
         </div>
-        <h2 id="reg-t" style="margin-top: 80px; margin-bottom: 20px;">РЕГИСТРАЦИЯ</h2>
-        <input type="text" id="in-f" placeholder="ИМЯ" style="background:#111; border:1px solid #333; padding:16px; color:#fff; border-radius:12px; width:300px; margin-bottom:15px;">
-        <button id="reg-b" class="btn-m" onclick="startCam()">ДАЛЕЕ</button>
+        <h2 id="t-reg" style="margin: 40px 0 20px;">РЕГИСТРАЦИЯ</h2>
+        <input type="text" id="name" placeholder="ИМЯ">
+        <button id="b-next" class="btn" onclick="goScan()">ДАЛЕЕ</button>
     </div>
 
     <div id="scr-scan" class="screen">
-        <video id="video-feed" autoplay playsinline></video>
-        <canvas id="photo-canvas" style="display:none;"></canvas>
-        <button id="cam-b" class="btn-m" style="margin-top:30px;" onclick="takePhoto()">СДЕЛАТЬ ФОТО</button>
+        <video id="v" autoplay playsinline></video>
+        <button id="b-cam" class="btn" style="margin-top: 20px;" onclick="takeP()">СДЕЛАТЬ ФОТО</button>
     </div>
 
     <div id="scr-chip" class="screen">
-        <h3 id="chip-t">ОЖИДАНИЕ ЧИПА...</h3>
-        <div class="ring-frame">
-            <img src="ring.png" alt="RING" onerror="this.style.display='none'">
-            <div id="ring-placeholder" style="font-size:80px;">💍</div>
-        </div>
-        <button id="chip-b" class="btn-m" onclick="toApp()">ПОДТВЕРДИТЬ</button>
-        <div class="btn-link" onclick="toApp()">ВОЙТИ БЕЗ ЧИПА</div>
+        <h3 id="t-chip" style="margin-top: 40px;">ОЖИДАНИЕ ЧИПА...</h3>
+        <div style="font-size: 100px; margin: 40px;">💍</div>
+        <button id="b-conf" class="btn" onclick="goApp()">ПОДТВЕРДИТЬ</button>
+        <div class="link" onclick="goApp()">ВХОД БЕЗ ЧИПА</div>
     </div>
 
     <div id="app">
         <header>BSMLH</header>
-        <div class="content">
-            <div id="view-chat"></div>
-            <div id="view-maps" style="display:none; height:100%;">
-                <iframe id="map-frame" style="width:100%; height:100%; border:0;"></iframe>
-            </div>
-            <div id="view-prof" style="display:none;">
-                <div class="wc-header">
-                    <img id="user-photo" src="" alt="">
-                    <div class="wc-name">
-                        <h2 id="u-name-disp">User</h2>
-                        <p>ID: bsmlh_vHUID_01</p>
-                    </div>
+        <div class="main" id="m-cont">
+            <div id="v-chat"></div>
+            <div id="v-prof" style="display:none; padding: 20px;">
+                <div style="display:flex; align-items:center; background:#fff; padding:20px; border-radius:10px;">
+                    <img id="p-img" style="width:70px; height:70px; border-radius:10px; background:#eee; object-fit:cover;">
+                    <div style="margin-left:15px;"><h2 id="p-name">User</h2><p style="color:#888;">ID: 77801</p></div>
                 </div>
-                <div class="wc-item"><span>Services</span><span>></span></div>
-                <div class="wc-item"><span>Settings</span><span>></span></div>
             </div>
         </div>
         <footer>
-            <div id="n-chat" class="n-btn on" onclick="tab('chat')">CHAT</div>
-            <div id="n-maps" class="n-btn" onclick="tab('maps')">MAPS</div>
-            <div id="n-prof" class="n-btn" onclick="tab('prof')">PROFILE</div>
+            <div class="n-btn on" id="n-chat" onclick="tab('chat')">CHAT</div>
+            <div class="n-btn" id="n-prof" onclick="tab('prof')">PROFILE</div>
         </footer>
     </div>
 
     <script>
-        const langs = {
-            'RU': { reg: "РЕГИСТРАЦИЯ", next: "ДАЛЕЕ", ph: "ИМЯ", chip: "ОЖИДАНИЕ ЧИПА...", act: "ПОДТВЕРДИТЬ" },
-            'EN': { reg: "REGISTRATION", next: "NEXT", ph: "NAME", chip: "WAITING FOR CHIP...", act: "CONFIRM" },
-            'AR': { reg: "تسجيل", next: "التالي", ph: "اسم", chip: "في انتظار الشريحة...", act: "تأكيد" },
-            'CH': { reg: "注册", next: "下一步", ph: "名字", chip: "等待芯片...", act: "确认" }
+        const txt = {
+            'RU': {r:"РЕГИСТРАЦИЯ", n:"ДАЛЕЕ", c:"ОЖИДАНИЕ ЧИПА...", f:"ПОДТВЕРДИТЬ"},
+            'EN': {r:"REGISTRATION", n:"NEXT", c:"WAITING FOR CHIP...", f:"CONFIRM"},
+            'AR': {r:"تسجيل", n:"التالي", c:"انتظار...", f:"تأكيد"},
+            'CH': {r:"注册", n:"下一步", c:"等待...", f:"确认"}
         };
 
-        function toggleLMenu() {
+        function toggleL() { 
             const m = document.getElementById('l-menu');
-            m.style.display = (m.style.display === 'flex') ? 'none' : 'flex';
+            m.style.display = m.style.display === 'block' ? 'none' : 'block';
         }
 
-        function setLang(l) {
-            const d = langs[l];
-            document.getElementById('reg-t').innerText = d.reg;
-            document.getElementById('reg-b').innerText = d.next;
-            document.getElementById('in-f').placeholder = d.ph;
-            document.getElementById('chip-t').innerText = d.chip;
-            document.getElementById('chip-b').innerText = d.act;
-            document.getElementById('l-menu').style.display = 'none';
+        function setL(l) {
+            document.getElementById('t-reg').innerText = txt[l].r;
+            document.getElementById('b-next').innerText = txt[l].n;
+            document.getElementById('t-chip').innerText = txt[l].c;
+            document.getElementById('b-conf').innerText = txt[l].f;
+            toggleL();
         }
 
-        async function startCam() {
-            if(!document.getElementById('in-f').value) return;
+        async function goScan() {
+            if(!document.getElementById('name').value) return;
             document.getElementById('scr-reg').classList.remove('active');
             document.getElementById('scr-scan').classList.add('active');
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
-                document.getElementById('video-feed').srcObject = stream;
-            } catch(e) { alert("Ошибка камеры"); toApp(); }
+            const s = await navigator.mediaDevices.getUserMedia({video:{facingMode:"user"}});
+            document.getElementById('v').srcObject = s;
         }
 
-        function takePhoto() {
-            const video = document.getElementById('video-feed');
-            const canvas = document.getElementById('photo-canvas');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            canvas.getContext('2d').drawImage(video, 0, 0);
-            document.getElementById('user-photo').src = canvas.toDataURL('image/png');
-            if(video.srcObject) video.srcObject.getTracks().forEach(t => t.stop());
+        function takeP() {
+            const v = document.getElementById('v');
+            const c = document.createElement('canvas');
+            c.width = v.videoWidth; c.height = v.videoHeight;
+            c.getContext('2d').drawImage(v, 0, 0);
+            document.getElementById('p-img').src = c.toDataURL();
+            v.srcObject.getTracks().forEach(t => t.stop());
             document.getElementById('scr-scan').classList.remove('active');
             document.getElementById('scr-chip').classList.add('active');
         }
 
-        function toApp() {
-            document.getElementById('u-name-disp').innerText = document.getElementById('in-f').value;
+        function goApp() {
+            document.getElementById('p-name').innerText = document.getElementById('name').value;
             document.getElementById('scr-chip').classList.remove('active');
             document.getElementById('app').style.display = 'flex';
-            loadChats();
-        }
-
-        function loadChats() {
-            const list = document.getElementById('view-chat');
-            const names = ["Alex", "Sarah", "Ahmed", "Li Wei", "Maria", "Ivan", "Fatima", "Chen", "John", "Elena"];
-            list.innerHTML = names.map(n => <div class="chat-item"><div class="chat-av">👤</div><div class="chat-info"><h4>${n}</h4><p>Secure message...</p></div></div>).join('');
+            const chat = document.getElementById('v-chat');
+            chat.innerHTML = "";
+            ["Alex", "Sarah", "Ivan", "Ahmed", "Li", "Maria", "John", "Elena", "Chen", "Fatima"].forEach(n => {
+                chat.innerHTML += <div class="c-item"><div class="c-av">👤</div><div><h4>${n}</h4><p style="font-size:12px;color:#999;">Secure message...</p></div></div>;
+            });
         }
 
         function tab(t) {
-            document.getElementById('view-chat').style.display = (t === 'chat' ? 'block' : 'none');
-            document.getElementById('view-maps').style.display = (t === 'maps' ? 'block' : 'none');
-            document.getElementById('view-prof').style.display = (t === 'prof' ? 'block' : 'none');
+            document.getElementById('v-chat').style.display = t === 'chat' ? 'block' : 'none';
+            document.getElementById('v-prof').style.display = t === 'prof' ? 'block' : 'none';
             document.querySelectorAll('.n-btn').forEach(b => b.classList.remove('on'));
-            document.getElementById('n-' + t).classList.add('on');
-            if(t === 'maps') document.getElementById('map-frame').src = "https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d1!2d0!3d0!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e1!3m2!1sru!2skz!4v1";
+            document.getElementById('n-'+t).classList.add('on');
         }
     </script>
 </body>
